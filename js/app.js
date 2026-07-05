@@ -844,6 +844,16 @@
     });
   }
 
+  /* Theme toggle — light/dark, remembered between visits */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".theme-toggle");
+    if (!btn) return;
+    var el = document.documentElement;
+    var next = el.getAttribute("data-theme") === "light" ? "dark" : "light";
+    el.setAttribute("data-theme", next);
+    try { localStorage.setItem("spt-theme", next); } catch (err) {}
+  });
+
   /* One delegated listener covers every View Pics button, including
      buttons re-rendered on season switch. */
   document.addEventListener("click", function (e) {
