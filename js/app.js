@@ -27,9 +27,47 @@
      Optional images/players/players.json maps poker name to
      { "realName": "...", "firstPlayed": "..." } (both optional;
      firstPlayed overrides the season derived from the databook). */
-  var PLAYERS_IMG_BASE = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" +
-    GITHUB_REPO + "/" + GITHUB_BRANCH + "/images/players/";
+  var RAW_BASE = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" +
+    GITHUB_REPO + "/" + GITHUB_BRANCH + "/";
+  var PLAYERS_IMG_BASE = RAW_BASE + "images/players/";
   var URL_PLAYER_META = PLAYERS_IMG_BASE + "players.json";
+
+  /* One repo-tree call indexes every file under images/ — powers the
+     View pics / Add pics button states and the galleries without
+     per-folder API requests. */
+  var IMG_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+  var repoIndex = null;
+  var repoIndexPromise = fetch("https://api.github.com/repos/" + GITHUB_OWNER + "/" +
+      GITHUB_REPO + "/git/trees/" + GITHUB_BRANCH + "?recursive=1")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (t) {
+      if (!t || !t.tree) return null;
+      var idx = {};
+      t.tree.forEach(function (f) {
+        if (f.type !== "blob") return;
+        var m = f.path.match(/^images\/([^\/]+)\/([^\/]+)$/);
+        if (!m) return;
+        (idx[m[1]] = idx[m[1]] || []).push(m[2]);
+      });
+      return idx;
+    })
+    .catch(function () { return null; });
+  repoIndexPromise.then(function (idx) { repoIndex = idx; refreshPicsButtons(); });
+
+  function folderHasPics(folder) {
+    if (!repoIndex) return null; // unknown yet
+    return (repoIndex[folder] || []).some(function (n) { return IMG_EXT.test(n); });
+  }
+
+  function refreshPicsButtons() {
+    if (!repoIndex) return;
+    var btns = document.querySelectorAll(".pics-btn");
+    for (var i = 0; i < btns.length; i++) {
+      var has = folderHasPics(btns[i].getAttribute("data-folder"));
+      btns[i].textContent = has ? "View pics" : "Add pics";
+      btns[i].classList.toggle("pics-btn-empty", !has);
+    }
+  }
 
   var THE_FIVE = ["Concierge", "Doctor", "Dyna-mite", "Ices", "Smooth"];
 
@@ -281,7 +319,13 @@
       total: Math.max.apply(null, ranked.map(function (p) { return p.total; })),
       ppg: Math.max.apply(null, ranked.map(function (p) { return p.ppg; }))
     };
+    var gapDone = false;
     tbody.innerHTML = ranked.map(function (p, i) {
+      var spacer = "";
+      if (!gapDone && THE_FIVE.indexOf(p.name) === -1) {
+        spacer = '<tr class="lb-spacer" aria-hidden="true"><td colspan="11"></td></tr>';
+        gapDone = true;
+      }
       var leader = i === 0 ? ' class="is-leader"' : "";
       var era = THE_FIVE.indexOf(p.name) === -1 ? eraFor(site, p.name) : null;
       var nameCell = displayName(p.name) +
@@ -293,7 +337,7 @@
         '<td class="num">' + fmt(p.games) + "</td>" +
         '<td class="num">' + (p.ppg === bests.ppg ? '<span class="best-mark">' + p.ppg.toFixed(2) + "</span>" : p.ppg.toFixed(2)) + "</td>" +
         p.placings.map(function (v) { return '<td class="num">' + fmt(v) + "</td>"; }).join("");
-      return "<tr" + leader + ">" + cells + "</tr>";
+      return spacer + "<tr" + leader + ">" + cells + "</tr>";
     }).join("");
   }
 
@@ -343,13 +387,32 @@
     }).join("");
   }
 
-  function renderSubs(lb, site, playerMeta) {
+  /* First game a player appears in, at game precision: "SPT 15.5" */
+  function firstGameFor(gamesData, site, name) {
+    if (!gamesData) return null;
+    for (var i = 0; i < site.seasons.length; i++) {
+      var s = gamesData[site.seasons[i]];
+      if (!s) continue;
+      var rows = s.majors.concat(s.subs);
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].name !== name) continue;
+        for (var g = 0; g < 10; g++) {
+          if (rows[r].pts[g] !== null) {
+            return "SPT " + site.seasons[i].replace(/\D/g, "") + "." + (g + 1);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  function renderSubs(lb, site, playerMeta, gamesData) {
     var host = document.getElementById("sub-cards");
     if (!host) return;
     var subs = lb.subs.slice().sort(function (a, b) { return b.total - a.total || b.games - a.games; });
     host.innerHTML = subs.map(function (p) {
       var m = metaFor(playerMeta, p.name);
-      var first = m.firstPlayed || firstSeasonFor(site, p.name);
+      var first = m.firstPlayed || firstGameFor(gamesData, site, p.name) || firstSeasonFor(site, p.name);
       return profileCardHTML({
         name: p.name,
         title: p.name,
@@ -401,17 +464,53 @@
     return bySeason;
   }
 
+  /* When a substitute covers a seat, the databook records the points
+     in BOTH rows. A sub whose value duplicates a seat's value in that
+     game IS that seat's result — exclude them from the ranking pool
+     (and remember the match: it tells us who they played for). Subs
+     with a unique value genuinely sat as an extra and stay in. */
+  function rankPoolFor(s, gameIdx) {
+    var seatVals = {};
+    for (var i = 0; i < s.majors.length; i++) {
+      var v = s.majors[i].pts[gameIdx];
+      if (v !== null) seatVals[v] = true;
+    }
+    return s.majors.concat(s.subs.filter(function (p) {
+      var v = p.pts[gameIdx];
+      return v !== null && !seatVals[v];
+    }));
+  }
+
   /* Position via competition ranking within a game: 1 + players who
      scored strictly more. Handles ties and any off-scale scores. */
-  function positionIn(gameIdx, player, everyone) {
+  function positionIn(gameIdx, player, pool) {
     var mine = player.pts[gameIdx];
     if (mine === null) return null;
     var above = 0;
-    for (var i = 0; i < everyone.length; i++) {
-      var v = everyone[i].pts[gameIdx];
+    for (var i = 0; i < pool.length; i++) {
+      var v = pool[i].pts[gameIdx];
       if (v !== null && v > mine) above++;
     }
     return above + 1;
+  }
+
+  /* Which seat(s) did a sub cover, per game — inferred from the
+     duplicated value. Returns [{game, majors:[names]}] */
+  function subCoverage(s, subName) {
+    var out = [];
+    for (var i = 0; i < s.subs.length; i++) {
+      if (s.subs[i].name !== subName) continue;
+      for (var g = 0; g < 10; g++) {
+        var v = s.subs[i].pts[g];
+        if (v === null) continue;
+        var majors = [];
+        for (var m = 0; m < s.majors.length; m++) {
+          if (s.majors[m].pts[g] === v) majors.push(s.majors[m].name);
+        }
+        if (majors.length) out.push({ game: g, majors: majors });
+      }
+    }
+    return out;
   }
 
   function ordinal(n) {
@@ -430,6 +529,8 @@
     for (var g = 0; g < 10; g++) {
       if (everyone.some(function (p) { return p.pts[g] !== null; })) playedIdx.push(g);
     }
+    var pools = {};
+    playedIdx.forEach(function (g) { pools[g] = rankPoolFor(s, g); });
     if (!playedIdx.length) { host.innerHTML = ""; return; }
 
     var head = "<tr><th scope=\"col\" class=\"game-meta-h\">Game</th>" +
@@ -451,9 +552,10 @@
         "View pics</button>" +
         "</th>";
       var cells = s.majors.map(function (p) {
-        var pos = positionIn(g, p, everyone);
-        if (pos === null) return '<td class="pos-cell pos-none">\u2014</td>';
-        return '<td class="pos-cell pos-' + Math.min(pos, 6) + '">' +
+        var attrs = ' data-major="' + p.name + '" data-game="' + g + '"';
+        var pos = positionIn(g, p, pools[g]);
+        if (pos === null) return '<td class="pos-cell pos-none"' + attrs + ">\u2014</td>";
+        return '<td class="pos-cell pos-' + Math.min(pos, 6) + '"' + attrs + ">" +
           '<span class="pos-ord">' + ordinal(pos) + "</span>" +
           '<span class="pos-pts">' + fmt(p.pts[g]) + " pts</span>" +
           "</td>";
@@ -466,6 +568,7 @@
     host.innerHTML =
       '<div class="table-wrap games-wrap"><table class="games-table">' +
       "<thead>" + head + "</thead><tbody>" + body + "</tbody></table></div>";
+    refreshPicsButtons();
   }
 
   /* ------------------------------------------------------------------
@@ -484,7 +587,9 @@
     return rows;
   }
 
-  function renderSeasonStandings(lb, site, seasonIdx) {
+  var currentSubCoverage = {};
+
+  function renderSeasonStandings(lb, site, seasonIdx, gamesData) {
     var host = document.getElementById("season-standings");
     var subsBlock = document.getElementById("season-subs-block");
     var subsHost = document.getElementById("season-subs");
@@ -517,12 +622,25 @@
         );
       }).join("");
     }
+    /* Coverage map: which seat each sub played for (per game),
+       inferred from the games data. Clickable when known. */
+    currentSubCoverage = {};
+    var seasonGames = gamesData && gamesData[site.seasons[seasonIdx]];
+    if (seasonGames) {
+      subs.forEach(function (r) {
+        var cov = subCoverage(seasonGames, r.name);
+        if (cov.length) currentSubCoverage[r.name] = cov;
+      });
+    }
     if (subsBlock && subsHost) {
       if (subs.length) {
         subsBlock.hidden = false;
         subsHost.innerHTML = subs.map(function (r) {
+          var clickable = !!currentSubCoverage[r.name];
           return (
-            '<li class="standing-row standing-sub">' +
+            '<li class="standing-row standing-sub' + (clickable ? " standing-click" : "") + '"' +
+              (clickable ? ' data-sub="' + r.name + '" role="button" tabindex="0" aria-pressed="false"' +
+                ' title="Show the seat ' + r.name + ' played for"' : "") + ">" +
               '<span class="standing-rank">\u00b7</span>' +
               '<span class="standing-name">' + r.name + "</span>" +
               '<span class="standing-points">' + fmt(r.points) + "</span>" +
@@ -536,6 +654,40 @@
     }
   }
 
+  function clearSubHighlights() {
+    var cells = document.querySelectorAll(".pos-cell.cell-hint");
+    for (var i = 0; i < cells.length; i++) cells[i].classList.remove("cell-hint");
+    var rows = document.querySelectorAll('.standing-click[aria-pressed="true"]');
+    for (var j = 0; j < rows.length; j++) rows[j].setAttribute("aria-pressed", "false");
+  }
+
+  function toggleSubHighlight(row) {
+    var name = row.getAttribute("data-sub");
+    var wasOn = row.getAttribute("aria-pressed") === "true";
+    clearSubHighlights();
+    if (wasOn) return;
+    row.setAttribute("aria-pressed", "true");
+    var cov = currentSubCoverage[name] || [];
+    cov.forEach(function (c) {
+      c.majors.forEach(function (m) {
+        var cell = document.querySelector(
+          '.pos-cell[data-major="' + m + '"][data-game="' + c.game + '"]');
+        if (cell) cell.classList.add("cell-hint");
+      });
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var row = e.target.closest(".standing-click");
+    if (row) toggleSubHighlight(row);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var row = e.target.closest ? e.target.closest(".standing-click") : null;
+    if (row) { e.preventDefault(); toggleSubHighlight(row); }
+  });
+
   function renderSeasons(lb, site, gamesData) {
     var pillsHost = document.getElementById("season-pills");
     if (!pillsHost) return;
@@ -548,7 +700,7 @@
           parseInt(pills[i].getAttribute("data-season"), 10) === idx ? "true" : "false");
       }
       renderSeasonGames(gamesData, site.seasons[idx]);
-      renderSeasonStandings(lb, site, idx);
+      renderSeasonStandings(lb, site, idx, gamesData);
     }
 
     pillsHost.innerHTML = '<span class="season-grid-label">SPT</span>' +
@@ -577,6 +729,22 @@
 
   function fetchGallery(folder) {
     if (galleryCache[folder]) return galleryCache[folder];
+    if (repoIndex) {
+      var files = repoIndex[folder] || [];
+      var images = files.filter(function (n) { return IMG_EXT.test(n); })
+        .sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); })
+        .map(function (n) {
+          return { name: n, download_url: RAW_BASE + "images/" + folder + "/" + encodeURIComponent(n) };
+        });
+      var hasCaps = files.indexOf("captions.json") !== -1;
+      galleryCache[folder] = (hasCaps
+        ? fetch(RAW_BASE + "images/" + folder + "/captions.json")
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .catch(function () { return {}; })
+        : Promise.resolve({})
+      ).then(function (caps) { return { images: images, captions: caps || {} }; });
+      return galleryCache[folder];
+    }
     var apiUrl = "https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO +
       "/contents/images/" + encodeURIComponent(folder) + "?ref=" + GITHUB_BRANCH;
     galleryCache[folder] = fetch(apiUrl)
@@ -728,7 +896,7 @@
       } else if (page === "players") {
         renderOGs(lb, site, playerMeta);
         renderPastSeats(lb, site, playerMeta);
-        renderSubs(lb, site, playerMeta);
+        renderSubs(lb, site, playerMeta, gamesData);
       }
     })
     .catch(function (err) {

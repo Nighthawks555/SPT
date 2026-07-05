@@ -397,6 +397,15 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 
 .lb-table td .best-mark { color: var(--blue); }
 
+.lb-table tr.lb-spacer td {
+  height: 16px;
+  padding: 0;
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--ink-0);
+}
+
+.lb-table tr.lb-spacer:hover { background: transparent; }
+
 .table-footnote {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -552,10 +561,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 .games-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;   /* equal player columns, always */
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  min-width: 680px;
+  min-width: 760px;
 }
+
+.games-table .game-meta-h,
+.games-table .game-meta { width: 200px; }
 
 .games-table th {
   text-align: left;
@@ -578,7 +591,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
   border-bottom: 1px solid var(--line);
   text-transform: none;
   letter-spacing: normal;
-  min-width: 150px;
+  white-space: normal;
 }
 
 .game-no {
@@ -622,6 +635,13 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 .pos-5 .pos-ord { color: #6f737b; }
 .pos-6 .pos-ord { color: var(--grey-lo); }
 .pos-none { color: var(--grey-lo); }
+
+.pos-cell.cell-hint { background: #1c1e23; box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+.standing-click { cursor: pointer; }
+.standing-click:hover .standing-name { color: var(--paper); }
+.standing-click[aria-pressed="true"] { background: #1c1e23; }
+.standing-click[aria-pressed="true"] .standing-name { color: var(--paper); }
 
 /* Tally + subs layout */
 .season-cols {
@@ -717,6 +737,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 }
 
 .pics-btn:hover, .pics-btn:focus-visible { color: var(--blue); border-color: var(--blue); }
+
+.pics-btn-empty { opacity: 0.5; }
+.pics-btn-empty:hover, .pics-btn-empty:focus-visible { opacity: 0.8; color: var(--grey-mid); border-color: var(--line-strong); }
 
 .pics-modal {
   position: fixed;
