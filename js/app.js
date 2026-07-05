@@ -10,6 +10,26 @@
   var BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVMK7oQCF4qf-Jhan0o4GS8BQEDVeavP9O0TDj6f1JDrr945ks9aycIngxlCrVlUHXyNMixaSw6Uq2/pub";
   var URL_LEADERBOARD = BASE + "?gid=232414899&single=true&output=csv";
   var URL_SITE = BASE + "?gid=556175416&single=true&output=csv";
+  /* GAMES tab gid — per-game results. Once the GAMES tab is published,
+     replace the placeholder below with its gid. Until then the games
+     grid quietly stays hidden and everything else works. */
+  var GAMES_GID = "1306722529";
+  var URL_GAMES = BASE + "?gid=" + GAMES_GID + "&single=true&output=csv";
+
+  /* Photo gallery — images live in the GitHub repo under
+     images/{season}.{game}/ e.g. images/22.1/. Fill in the repo owner
+     below (the GitHub username the SPT repo lives under). */
+  var GITHUB_OWNER = "Nighthawks555";
+  var GITHUB_REPO = "SPT";
+  var GITHUB_BRANCH = "main";
+
+  /* Player profile photos — images/players/{Poker Name}.jpg in the repo.
+     Optional images/players/players.json maps poker name to
+     { "realName": "...", "firstPlayed": "..." } (both optional;
+     firstPlayed overrides the season derived from the databook). */
+  var PLAYERS_IMG_BASE = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" +
+    GITHUB_REPO + "/" + GITHUB_BRANCH + "/images/players/";
+  var URL_PLAYER_META = PLAYERS_IMG_BASE + "players.json";
 
   var THE_FIVE = ["Concierge", "Doctor", "Dyna-mite", "Ices", "Smooth"];
 
@@ -154,17 +174,55 @@
     return name.split(/[\s-]+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
   }
 
-  function avatarSlug(name) {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  function photoURL(name) {
+    return PLAYERS_IMG_BASE + encodeURIComponent(name) + ".jpg";
   }
 
-  /* Avatar: tries assets/avatars/<slug>.jpg, falls back to a monogram */
+  /* Avatar: images/players/{Poker Name}.jpg from the repo, monogram fallback */
   function avatarHTML(name) {
-    var slug = avatarSlug(name);
     return '<div class="avatar">' +
-      '<img src="assets/avatars/' + slug + '.jpg" alt="" loading="lazy" ' +
+      '<img src="' + photoURL(name) + '" alt="" loading="lazy" ' +
       "onerror=\"this.parentNode.textContent='" + initials(name) + "'\">" +
       "</div>";
+  }
+
+  function firstSeasonFor(site, name) {
+    var hist = seasonHistoryFor(site, name);
+    if (!hist) return null;
+    for (var i = 0; i < hist.length; i++) {
+      if (hist[i] > 0) return site.seasons[i];
+    }
+    return null;
+  }
+
+  function metaFor(playerMeta, name) {
+    var m = (playerMeta && playerMeta[name]) || null;
+    if (typeof m === "string") return { realName: m, firstPlayed: null };
+    return { realName: (m && m.realName) || "", firstPlayed: (m && m.firstPlayed) || null };
+  }
+
+  /* Unified compact profile card — OG's, Past Seats, and Substitutes
+     all share this shape. */
+  function profileCardHTML(opts) {
+    var statsRow = opts.stats && opts.stats.length
+      ? '<div class="profile-stats">' + opts.stats.map(function (s) {
+          return '<span class="profile-stat"><b>' + s.v + "</b> " + s.k + "</span>";
+        }).join("") + "</div>"
+      : "";
+    return (
+      '<article class="profile-card" tabindex="0">' +
+        '<div class="profile-photo">' +
+          '<img src="' + photoURL(opts.photoName || opts.name) + '" alt="" loading="lazy" ' +
+          "onerror=\"this.parentNode.textContent='" + initials(opts.title) + "'\">" +
+        "</div>" +
+        '<div class="profile-body">' +
+          '<h3 class="profile-name">' + opts.title + "</h3>" +
+          (opts.realName ? '<div class="profile-real">' + opts.realName + "</div>" : "") +
+          (opts.meta ? '<div class="profile-meta">' + opts.meta + "</div>" : "") +
+          statsRow +
+        "</div>" +
+      "</article>"
+    );
   }
 
   /* ------------------------------------------------------------------
@@ -239,53 +297,392 @@
     }).join("");
   }
 
-  function renderPastSeats(lb, site) {
+  function renderOGs(lb, site, playerMeta) {
+    var host = document.getElementById("og-cards");
+    if (!host) return;
+    host.innerHTML = THE_FIVE.map(function (name) {
+      var p = null;
+      for (var i = 0; i < lb.core.length; i++) if (lb.core[i].name === name) { p = lb.core[i]; break; }
+      if (!p) return "";
+      var m = metaFor(playerMeta, name);
+      var first = m.firstPlayed || firstSeasonFor(site, name);
+      return profileCardHTML({
+        name: name,
+        title: name,
+        realName: m.realName,
+        meta: first ? "First played " + first : "",
+        stats: [
+          { v: fmt(p.total), k: "pts" },
+          { v: fmt(p.games), k: "games" },
+          { v: p.ppg.toFixed(2), k: "ppg" }
+        ]
+      });
+    }).join("");
+  }
+
+  function renderPastSeats(lb, site, playerMeta) {
     var host = document.getElementById("seat-cards");
     if (!host) return;
     var seats = lb.core.filter(function (p) { return THE_FIVE.indexOf(p.name) === -1; });
     if (!seats.length) { host.innerHTML = ""; return; }
     host.innerHTML = seats.map(function (p) {
       var era = eraFor(site, p.name);
+      var m = metaFor(playerMeta, p.name);
       var note = SEAT_NOTES[p.name] || "";
-      var sub = era
-        ? note + (note ? " \u00b7 " : "") + era.label
-        : note;
-      var hist = seasonHistoryFor(site, p.name);
-      var sparkBlock = hist && hist.length > 1 ? sparkline(hist) : "";
-      return (
-        '<article class="player-card" tabindex="0">' +
-          avatarHTML(p.name) +
-          "<div>" +
-            '<h3 class="player-name">' + displayName(p.name) + "</h3>" +
-            '<div class="player-rank">' + sub + "</div>" +
-          "</div>" +
-          '<div class="card-stats">' +
-            '<div class="card-stat"><span class="v">' + fmt(p.total) + '</span><span class="k">Points</span></div>' +
-            '<div class="card-stat"><span class="v">' + fmt(p.games) + '</span><span class="k">Games</span></div>' +
-            '<div class="card-stat"><span class="v">' + p.ppg.toFixed(2) + '</span><span class="k">PPG</span></div>' +
-          "</div>" +
-          sparkBlock +
-        "</article>"
-      );
+      return profileCardHTML({
+        name: p.name,
+        title: displayName(p.name),
+        realName: m.realName,
+        meta: (note ? note + (era ? " \u00b7 " : "") : "") + (era ? era.label : ""),
+        stats: [
+          { v: fmt(p.total), k: "pts" },
+          { v: fmt(p.games), k: "games" },
+          { v: p.ppg.toFixed(2), k: "ppg" }
+        ]
+      });
     }).join("");
   }
 
-  function renderSubs(lb) {
+  function renderSubs(lb, site, playerMeta) {
     var host = document.getElementById("sub-cards");
     if (!host) return;
     var subs = lb.subs.slice().sort(function (a, b) { return b.total - a.total || b.games - a.games; });
     host.innerHTML = subs.map(function (p) {
-      return (
-        '<div class="sub-card">' +
-          '<div class="sub-name">' + p.name + "</div>" +
-          '<div class="sub-stats">' +
-            "<span><b>" + fmt(p.total) + "</b> pts</span>" +
-            "<span><b>" + fmt(p.games) + "</b> " + (p.games === 1 ? "game" : "games") + "</span>" +
-          "</div>" +
-        "</div>"
-      );
+      var m = metaFor(playerMeta, p.name);
+      var first = m.firstPlayed || firstSeasonFor(site, p.name);
+      return profileCardHTML({
+        name: p.name,
+        title: p.name,
+        realName: m.realName,
+        meta: first ? "First played " + first : "",
+        stats: [
+          { v: fmt(p.total), k: "pts" },
+          { v: fmt(p.games), k: p.games === 1 ? "game" : "games" }
+        ]
+      });
     }).join("");
   }
+
+  /* ------------------------------------------------------------------
+     GAMES tab — every season sheet stacked: SEASON | LABEL | G1…G10.
+     Rows are identified by their label (Round Name, Location, player,
+     Substitutes marker), never by position.
+     ------------------------------------------------------------------ */
+  function parseGames(rows) {
+    var bySeason = {};
+    var lastSeason = "";
+    for (var i = 1; i < rows.length; i++) {
+      var rawSeason = (rows[i][0] || "").trim();
+      /* The stacking formula only writes the season on each block's
+         first row; the rest export as blank or #N/A. Forward-fill. */
+      if (rawSeason && rawSeason.indexOf("#") !== 0) lastSeason = rawSeason;
+      var season = lastSeason;
+      if (!season) continue;
+      var label = (rows[i][1] || "").trim();
+      var cells = rows[i].slice(2, 12);
+      if (!bySeason[season]) {
+        bySeason[season] = { names: [], venues: [], majors: [], subs: [], pastMarker: false };
+      }
+      var s = bySeason[season];
+      if (!label) continue;
+      if (/^round no\.?$/i.test(label)) continue;
+      if (/^round name$/i.test(label)) { s.names = cells.map(function (c) { return String(c || "").replace(/\n/g, " ").trim(); }); continue; }
+      if (/^location$/i.test(label)) { s.venues = cells.map(function (c) { return String(c || "").trim(); }); continue; }
+      if (/^substitutes?$/i.test(label)) { s.pastMarker = true; continue; }
+      var pts = cells.map(function (c) {
+        var t = String(c === null || c === undefined ? "" : c).trim();
+        return t === "" ? null : num(t);
+      });
+      var played = pts.some(function (v) { return v !== null; });
+      var entry = { name: label, pts: pts };
+      if (s.pastMarker) { if (played) s.subs.push(entry); }
+      else { if (played) s.majors.push(entry); }
+    }
+    return bySeason;
+  }
+
+  /* Position via competition ranking within a game: 1 + players who
+     scored strictly more. Handles ties and any off-scale scores. */
+  function positionIn(gameIdx, player, everyone) {
+    var mine = player.pts[gameIdx];
+    if (mine === null) return null;
+    var above = 0;
+    for (var i = 0; i < everyone.length; i++) {
+      var v = everyone[i].pts[gameIdx];
+      if (v !== null && v > mine) above++;
+    }
+    return above + 1;
+  }
+
+  function ordinal(n) {
+    var s = ["th", "st", "nd", "rd"], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  function renderSeasonGames(gamesData, seasonName) {
+    var host = document.getElementById("season-games");
+    if (!host) return;
+    var s = gamesData && gamesData[seasonName];
+    if (!s || !s.majors.length) { host.innerHTML = ""; return; }
+    var everyone = s.majors.concat(s.subs);
+    // Games that were actually played
+    var playedIdx = [];
+    for (var g = 0; g < 10; g++) {
+      if (everyone.some(function (p) { return p.pts[g] !== null; })) playedIdx.push(g);
+    }
+    if (!playedIdx.length) { host.innerHTML = ""; return; }
+
+    var head = "<tr><th scope=\"col\" class=\"game-meta-h\">Game</th>" +
+      s.majors.map(function (p) {
+        return '<th scope="col">' + displayName(p.name) + "</th>";
+      }).join("") + "</tr>";
+
+    var body = playedIdx.map(function (g) {
+      var name = s.names[g] || "";
+      var venue = s.venues[g] || "";
+      var seasonNo = seasonName.replace(/\D/g, "");
+      var folder = seasonNo + "." + (g + 1);
+      var meta = '<th scope="row" class="game-meta">' +
+        '<span class="game-no">' + (g + 1) + "</span>" +
+        '<span class="game-name">' + name + "</span>" +
+        (venue ? '<span class="game-venue">' + venue + "</span>" : "") +
+        '<button type="button" class="pics-btn" data-folder="' + folder + '"' +
+        ' data-title="' + seasonName + " \u00b7 Game " + (g + 1) + (name ? " \u00b7 " + name : "") + '">' +
+        "View pics</button>" +
+        "</th>";
+      var cells = s.majors.map(function (p) {
+        var pos = positionIn(g, p, everyone);
+        if (pos === null) return '<td class="pos-cell pos-none">\u2014</td>';
+        return '<td class="pos-cell pos-' + Math.min(pos, 6) + '">' +
+          '<span class="pos-ord">' + ordinal(pos) + "</span>" +
+          '<span class="pos-pts">' + fmt(p.pts[g]) + " pts</span>" +
+          "</td>";
+      }).join("");
+      // Guest / sub appearances in this game, shown under the grid row? No —
+      // keep the grid majors-only; subs get their own list below.
+      return "<tr>" + meta + cells + "</tr>";
+    }).join("");
+
+    host.innerHTML =
+      '<div class="table-wrap games-wrap"><table class="games-table">' +
+      "<thead>" + head + "</thead><tbody>" + body + "</tbody></table></div>";
+  }
+
+  /* ------------------------------------------------------------------
+     Season tally — majors only, ranked; subs listed separately below.
+     Majors = the leaderboard's core seats (The Five + Phantom + Joker
+     Seat), whoever of them scored that season.
+     ------------------------------------------------------------------ */
+  function standingsFor(site, seasonIdx) {
+    var rows = [];
+    for (var i = 0; i < site.players.length; i++) {
+      var p = site.players[i];
+      var pts = p.seasons[seasonIdx];
+      if (pts > 0) rows.push({ name: p.name, points: pts });
+    }
+    rows.sort(function (a, b) { return b.points - a.points; });
+    return rows;
+  }
+
+  function renderSeasonStandings(lb, site, seasonIdx) {
+    var host = document.getElementById("season-standings");
+    var subsBlock = document.getElementById("season-subs-block");
+    var subsHost = document.getElementById("season-subs");
+    if (!host) return;
+    var coreNames = lb.core.map(function (p) { return p.name; });
+    var all = standingsFor(site, seasonIdx);
+    var majors = [], subs = [];
+    var seenCore = {};
+    for (var i = 0; i < all.length; i++) {
+      var isCore = coreNames.indexOf(all[i].name) !== -1 && !seenCore[all[i].name];
+      if (isCore) { majors.push(all[i]); seenCore[all[i].name] = true; }
+      else subs.push(all[i]);
+    }
+    var isCurrent = seasonIdx === site.seasons.length - 1;
+    if (!majors.length) {
+      host.innerHTML = '<li class="loading-note">No results on the board for ' +
+        site.seasons[seasonIdx] + " yet.</li>";
+    } else {
+      host.innerHTML = majors.map(function (r, i) {
+        var isTop = i === 0;
+        var badge = isTop
+          ? '<span class="champ-badge">' + (isCurrent ? "Leading" : "Champion") + "</span>"
+          : "";
+        return (
+          '<li class="standing-row' + (isTop ? " is-champ" : "") + '">' +
+            '<span class="standing-rank">' + (i + 1) + "</span>" +
+            '<span class="standing-name">' + displayName(r.name) + badge + "</span>" +
+            '<span class="standing-points">' + fmt(r.points) + "</span>" +
+          "</li>"
+        );
+      }).join("");
+    }
+    if (subsBlock && subsHost) {
+      if (subs.length) {
+        subsBlock.hidden = false;
+        subsHost.innerHTML = subs.map(function (r) {
+          return (
+            '<li class="standing-row standing-sub">' +
+              '<span class="standing-rank">\u00b7</span>' +
+              '<span class="standing-name">' + r.name + "</span>" +
+              '<span class="standing-points">' + fmt(r.points) + "</span>" +
+            "</li>"
+          );
+        }).join("");
+      } else {
+        subsBlock.hidden = true;
+        subsHost.innerHTML = "";
+      }
+    }
+  }
+
+  function renderSeasons(lb, site, gamesData) {
+    var pillsHost = document.getElementById("season-pills");
+    if (!pillsHost) return;
+    var latest = site.seasons.length - 1;
+
+    function show(idx) {
+      var pills = pillsHost.querySelectorAll(".season-cell");
+      for (var i = 0; i < pills.length; i++) {
+        pills[i].setAttribute("aria-pressed",
+          parseInt(pills[i].getAttribute("data-season"), 10) === idx ? "true" : "false");
+      }
+      renderSeasonGames(gamesData, site.seasons[idx]);
+      renderSeasonStandings(lb, site, idx);
+    }
+
+    pillsHost.innerHTML = '<span class="season-grid-label">SPT</span>' +
+      site.seasons.map(function (s, i) {
+        var short = s.replace(/^SPT/i, "");
+        return '<button type="button" class="season-cell" data-season="' + i + '"' +
+          ' aria-label="' + s + '" aria-pressed="' + (i === latest ? "true" : "false") + '">' +
+          short + "</button>";
+      }).join("");
+
+    pillsHost.addEventListener("click", function (e) {
+      var btn = e.target.closest(".season-cell");
+      if (!btn) return;
+      show(parseInt(btn.getAttribute("data-season"), 10));
+    });
+
+    show(latest);
+  }
+
+  /* ------------------------------------------------------------------
+     Photo gallery — lists images/{season}.{game}/ from the GitHub repo
+     via the contents API, with optional captions.json in each folder
+     mapping filename -> caption. Results are cached per session.
+     ------------------------------------------------------------------ */
+  var galleryCache = {};
+
+  function fetchGallery(folder) {
+    if (galleryCache[folder]) return galleryCache[folder];
+    var apiUrl = "https://api.github.com/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO +
+      "/contents/images/" + encodeURIComponent(folder) + "?ref=" + GITHUB_BRANCH;
+    galleryCache[folder] = fetch(apiUrl)
+      .then(function (res) {
+        if (res.status === 404) return [];
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (items) {
+        if (!Array.isArray(items)) return { images: [], captions: {} };
+        var images = items.filter(function (f) {
+          return f.type === "file" && /\.(jpe?g|png|webp|gif|avif)$/i.test(f.name);
+        }).sort(function (a, b) {
+          return a.name.localeCompare(b.name, undefined, { numeric: true });
+        });
+        var capFile = items.filter(function (f) { return f.name === "captions.json"; })[0];
+        if (!capFile) return { images: images, captions: {} };
+        return fetch(capFile.download_url)
+          .then(function (r) { return r.ok ? r.json() : {}; })
+          .catch(function () { return {}; })
+          .then(function (caps) { return { images: images, captions: caps || {} }; });
+      })
+      .catch(function () {
+        delete galleryCache[folder]; // allow retry
+        return null;
+      });
+    return galleryCache[folder];
+  }
+
+  function ensureModal() {
+    var modal = document.getElementById("pics-modal");
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.id = "pics-modal";
+    modal.className = "pics-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.innerHTML =
+      '<div class="pics-backdrop" data-close></div>' +
+      '<div class="pics-panel">' +
+        '<header class="pics-head">' +
+          '<h3 class="pics-title" id="pics-title"></h3>' +
+          '<button type="button" class="pics-close" data-close aria-label="Close">\u00d7</button>' +
+        "</header>" +
+        '<div class="pics-body" id="pics-body"></div>' +
+      "</div>";
+    document.body.appendChild(modal);
+    modal.addEventListener("click", function (e) {
+      if (e.target.hasAttribute("data-close")) closeModal();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeModal();
+    });
+    return modal;
+  }
+
+  function closeModal() {
+    var modal = document.getElementById("pics-modal");
+    if (modal) {
+      modal.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
+  }
+
+  function openGallery(folder, title) {
+    var modal = ensureModal();
+    var body = document.getElementById("pics-body");
+    document.getElementById("pics-title").textContent = title;
+    body.innerHTML = '<p class="pics-note">Fetching photos\u2026</p>';
+    modal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+
+    if (GITHUB_OWNER.indexOf("PASTE") === 0) {
+      body.innerHTML = '<p class="pics-note">Photo repository not connected yet.</p>';
+      return;
+    }
+
+    fetchGallery(folder).then(function (data) {
+      if (data === null) {
+        body.innerHTML = '<p class="pics-note">Couldn\u2019t reach the photo repository. Try again in a minute.</p>';
+        return;
+      }
+      if (!data.images || !data.images.length) {
+        body.innerHTML = '<p class="pics-note">No photos for this one yet. ' +
+          "Drop some into <code>images/" + folder + "/</code> in the repo.</p>";
+        return;
+      }
+      body.innerHTML = data.images.map(function (img) {
+        var cap = data.captions[img.name] || "";
+        return (
+          '<figure class="pics-item">' +
+            '<img src="' + img.download_url + '" alt="' + (cap || img.name) + '" loading="lazy">' +
+            (cap ? "<figcaption>" + cap + "</figcaption>" : "") +
+          "</figure>"
+        );
+      }).join("");
+    });
+  }
+
+  /* One delegated listener covers every View Pics button, including
+     buttons re-rendered on season switch. */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pics-btn");
+    if (!btn) return;
+    openGallery(btn.getAttribute("data-folder"), btn.getAttribute("data-title"));
+  });
 
   function showError(msg) {
     var note = '<div class="data-error">Couldn\u2019t reach the databook. ' + msg +
@@ -308,18 +705,30 @@
     }).then(parseCSV);
   }
 
-  Promise.all([fetchCSV(URL_LEADERBOARD), fetchCSV(URL_SITE)])
+  var gamesFetch = GAMES_GID.indexOf("PASTE") === 0
+    ? Promise.resolve(null)
+    : fetchCSV(URL_GAMES).catch(function () { return null; });
+
+  var metaFetch = fetch(URL_PLAYER_META)
+    .then(function (r) { return r.ok ? r.json() : {}; })
+    .catch(function () { return {}; });
+
+  Promise.all([fetchCSV(URL_LEADERBOARD), fetchCSV(URL_SITE), gamesFetch, metaFetch])
     .then(function (results) {
       var lb = parseLeaderboard(results[0]);
       var site = parseSite(results[1]);
+      var gamesData = results[2] ? parseGames(results[2]) : null;
+      var playerMeta = results[3] || {};
       var page = document.body.getAttribute("data-page");
       if (page === "dashboard") {
         renderHeroStats(lb, site);
         renderFeatureCards(lb, site);
         renderLeaderboardTable(lb, site);
+        renderSeasons(lb, site, gamesData);
       } else if (page === "players") {
-        renderPastSeats(lb, site);
-        renderSubs(lb);
+        renderOGs(lb, site, playerMeta);
+        renderPastSeats(lb, site, playerMeta);
+        renderSubs(lb, site, playerMeta);
       }
     })
     .catch(function (err) {

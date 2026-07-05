@@ -108,6 +108,36 @@
     <p class="table-footnote">Core player totals include results achieved by substitutes playing their seat. <a href="players.html">See the substitutes →</a></p>
   </section>
 
+  <!-- ============ SEASON RESULTS ============ -->
+  <section class="section" id="seasons">
+    <div class="section-head">
+      <h2>Season Results</h2>
+      <p class="section-sub">Every game, every position, every season. Pick a year.</p>
+    </div>
+    <nav class="season-grid" id="season-pills" aria-label="Season selector">
+      <span class="season-grid-label">SPT</span>
+    </nav>
+    <div class="season-detail">
+      <div id="season-games"></div>
+      <div class="season-cols">
+        <div class="season-block">
+          <h3 class="season-block-title">Season tally</h3>
+          <div class="season-panel">
+            <ol class="season-standings" id="season-standings">
+              <li class="loading-note">Cutting the deck…</li>
+            </ol>
+          </div>
+        </div>
+        <div class="season-block" id="season-subs-block" hidden>
+          <h3 class="season-block-title">Substitutes</h3>
+          <div class="season-panel">
+            <ol class="season-standings" id="season-subs"></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer class="site-footer">
