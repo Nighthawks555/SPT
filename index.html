@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPT — Season Poker Tournament</title>
+<meta name="description" content="Season Poker Tournament. Twenty-two seasons. One leaderboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="dashboard">
+
+<header class="site-header">
+  <a class="header-logo" href="index.html" aria-label="SPT home">
+    <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" class="spt-logo" role="img" aria-label="SPT logo">
+      <g class="logo-pixels">
+        <rect x="213.53" y="233.33" width="21.76" height="21.76" transform="translate(-55.11 422.74) rotate(-79.99)"/>
+        <rect x="240.6" y="238.11" width="21.76" height="21.76" transform="translate(-37.45 453.34) rotate(-79.99)"/>
+        <rect x="209.05" y="258.71" width="21.76" height="21.76" transform="translate(-83.8 439.29) rotate(-79.99)"/>
+        <rect x="236.12" y="263.49" width="21.76" height="21.76" transform="translate(-66.16 469.87) rotate(-79.98)"/>
+      </g>
+      <path class="logo-red" d="M311.81,128.16h-73.56l71.5,104.31-22.09-4.02-25.59,143.39h49.74c9.24,0,16.8-7.56,16.8-16.8v-210.08c0-9.24-7.56-16.8-16.8-16.8Z"/>
+      <path class="logo-blue" d="M126.77,199.17l28.12-19.9,6.2-34.72,16.58,2.96-3.19,17.9,52.65-37.26h-85.32c-9.24,0-16.8,7.56-16.8,16.8v190.39l23.6-132.2-21.83-3.97Z"/>
+      <g class="logo-word">
+        <path d="M410.3,289.94c.89-2.96,2.96-3.84,5.32-2.36,13.6,7.68,29.85,13.3,41.08,14.19,9.46,0,15.66-4.43,15.66-11.23,0-17.44-83.05-16.55-83.05-80.98,0-39.6,29.85-65.91,74.78-65.91,20.98,0,47.58,8.57,66.2,21.28,2.36,1.48,3.25,3.84,2.36,5.32l-18.62,41.67c-.89,2.96-2.96,3.84-5.32,2.36-14.48-8.28-31.33-14.48-41.67-15.37-9.16,0-15.07,4.14-15.07,10.64,0,17.44,83.64,16.25,83.64,81.28,0,39.31-30.44,65.61-75.96,65.61-24.83,0-50.83-7.68-65.61-19.51-2.36-1.77-3.25-3.84-2.36-5.32l18.62-41.67Z"/>
+        <path d="M620.25,148.08c51.72,0,82.76,28.08,82.76,70.34s-31.03,70.34-82.76,70.34h-12.12v59.11c0,2.07-2.07,4.14-4.73,4.14h-52.9c-2.07,0-4.14-2.07-4.14-4.14v-195.36c0-2.36,2.07-4.43,4.14-4.43h69.75ZM622.91,235.86c10.34,0,17.44-7.09,17.44-17.44s-7.09-17.44-17.44-17.44h-15.37v34.88h15.37Z"/>
+        <path d="M870.83,148.08c2.66,0,4.43,2.07,4.14,4.14l-4.43,44.92c-.3,2.36-2.66,4.14-4.73,4.14h-44.04v146.59c0,2.07-1.77,4.14-4.14,4.14h-52.31c-2.36,0-4.43-2.07-4.43-4.14v-146.59h-49.06c-2.07,0-4.14-1.77-4.14-4.14v-44.63c0-2.36,2.07-4.43,4.14-4.43h159.01Z"/>
+      </g>
+    </svg>
+  </a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="index.html" aria-current="page">Dashboard</a>
+    <a href="players.html">Players</a>
+  </nav>
+  <span class="season-tag">Season 22</span>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-logo-wrap" tabindex="0">
+      <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" class="spt-logo hero-logo" role="img" aria-label="SPT — Season Poker Tournament">
+        <g class="logo-pixels">
+          <rect x="213.53" y="233.33" width="21.76" height="21.76" transform="translate(-55.11 422.74) rotate(-79.99)"/>
+          <rect x="240.6" y="238.11" width="21.76" height="21.76" transform="translate(-37.45 453.34) rotate(-79.99)"/>
+          <rect x="209.05" y="258.71" width="21.76" height="21.76" transform="translate(-83.8 439.29) rotate(-79.99)"/>
+          <rect x="236.12" y="263.49" width="21.76" height="21.76" transform="translate(-66.16 469.87) rotate(-79.98)"/>
+        </g>
+        <path class="logo-red" d="M311.81,128.16h-73.56l71.5,104.31-22.09-4.02-25.59,143.39h49.74c9.24,0,16.8-7.56,16.8-16.8v-210.08c0-9.24-7.56-16.8-16.8-16.8Z"/>
+        <path class="logo-blue" d="M126.77,199.17l28.12-19.9,6.2-34.72,16.58,2.96-3.19,17.9,52.65-37.26h-85.32c-9.24,0-16.8,7.56-16.8,16.8v190.39l23.6-132.2-21.83-3.97Z"/>
+        <g class="logo-word">
+          <path d="M410.3,289.94c.89-2.96,2.96-3.84,5.32-2.36,13.6,7.68,29.85,13.3,41.08,14.19,9.46,0,15.66-4.43,15.66-11.23,0-17.44-83.05-16.55-83.05-80.98,0-39.6,29.85-65.91,74.78-65.91,20.98,0,47.58,8.57,66.2,21.28,2.36,1.48,3.25,3.84,2.36,5.32l-18.62,41.67c-.89,2.96-2.96,3.84-5.32,2.36-14.48-8.28-31.33-14.48-41.67-15.37-9.16,0-15.07,4.14-15.07,10.64,0,17.44,83.64,16.25,83.64,81.28,0,39.31-30.44,65.61-75.96,65.61-24.83,0-50.83-7.68-65.61-19.51-2.36-1.77-3.25-3.84-2.36-5.32l18.62-41.67Z"/>
+          <path d="M620.25,148.08c51.72,0,82.76,28.08,82.76,70.34s-31.03,70.34-82.76,70.34h-12.12v59.11c0,2.07-2.07,4.14-4.73,4.14h-52.9c-2.07,0-4.14-2.07-4.14-4.14v-195.36c0-2.36,2.07-4.43,4.14-4.43h69.75ZM622.91,235.86c10.34,0,17.44-7.09,17.44-17.44s-7.09-17.44-17.44-17.44h-15.37v34.88h15.37Z"/>
+          <path d="M870.83,148.08c2.66,0,4.43,2.07,4.14,4.14l-4.43,44.92c-.3,2.36-2.66,4.14-4.73,4.14h-44.04v146.59c0,2.07-1.77,4.14-4.14,4.14h-52.31c-2.36,0-4.43-2.07-4.43-4.14v-146.59h-49.06c-2.07,0-4.14-1.77-4.14-4.14v-44.63c0-2.36,2.07-4.43,4.14-4.43h159.01Z"/>
+        </g>
+      </svg>
+    </div>
+    <p class="hero-line">Season Poker Tournament</p>
+    <div class="hero-stats" id="hero-stats" aria-live="polite">
+      <div class="hero-stat"><span class="hero-stat-num" data-stat="seasons">—</span><span class="hero-stat-label">Seasons</span></div>
+      <div class="hero-stat"><span class="hero-stat-num" data-stat="players">—</span><span class="hero-stat-label">Players all-time</span></div>
+      <div class="hero-stat"><span class="hero-stat-num" data-stat="points">—</span><span class="hero-stat-label">Points awarded</span></div>
+    </div>
+  </section>
+
+  <!-- ============ THE FIVE ============ -->
+  <section class="section" id="the-five">
+    <div class="section-head">
+      <h2>The Five</h2>
+      <p class="section-sub">Every season since SPT1. Alphabetical — no hierarchy at this table.</p>
+    </div>
+    <div class="card-grid" id="feature-cards">
+      <p class="loading-note">Dealing…</p>
+    </div>
+  </section>
+
+  <!-- ============ LEADERBOARD ============ -->
+  <section class="section" id="leaderboard">
+    <div class="section-head">
+      <h2>All-Time Leaderboard</h2>
+      <p class="section-sub">Live from the SPT databook. Twenty-two seasons of consequences.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="lb-table" id="lb-table">
+        <thead>
+          <tr>
+            <th scope="col" class="col-rank">#</th>
+            <th scope="col" class="col-name">Player</th>
+            <th scope="col" class="num">Points</th>
+            <th scope="col" class="num">Games</th>
+            <th scope="col" class="num">PPG</th>
+            <th scope="col" class="num">1st</th>
+            <th scope="col" class="num">2nd</th>
+            <th scope="col" class="num">3rd</th>
+            <th scope="col" class="num">4th</th>
+            <th scope="col" class="num">5th</th>
+            <th scope="col" class="num">6th</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="11" class="loading-note">Shuffling up…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-footnote">Core player totals include results achieved by substitutes playing their seat. <a href="players.html">See the substitutes →</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>SPT — est. season one</span>
+  <span class="footer-dot" aria-hidden="true">◆</span>
+  <span>Data live from the databook</span>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
