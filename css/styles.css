@@ -289,8 +289,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--card-shadow);
-  padding: 1.4rem 1.2rem 1.2rem;
-  min-height: 340px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
@@ -304,9 +303,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 }
 
 .player-card .avatar {
-  width: 108px;
-  height: 108px;
-  border-radius: 10px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: calc(var(--radius) / 2);   /* half the card's corner radius */
   overflow: hidden;
   background: var(--ink-2);
   border: 1px solid var(--line-strong);
@@ -314,7 +313,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
   place-items: center;
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   color: var(--grey-mid);
 }
 
@@ -379,6 +378,67 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 .player-card:focus-within .spark-line { stroke: var(--blue); }
 .player-card:hover .spark-best, .player-card:hover .spark-worst,
 .player-card:focus-within .spark-best, .player-card:focus-within .spark-worst { opacity: 1; }
+
+.placings { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+
+.placings-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey-lo);
+  margin-bottom: 0.6rem;
+}
+
+.placings-chart { display: flex; align-items: center; gap: 0.9rem; }
+
+.placings-pie { width: 82px; height: 82px; flex-shrink: 0; }
+
+.pie-seg { stroke: var(--ink-1); stroke-width: 1.5; transition: fill 0.4s var(--ease); }
+.player-card:hover .pie-seg, .player-card:focus-within .pie-seg { stroke: var(--ink-2); }
+
+.seg-1 { fill: var(--paper); }
+.seg-2 { fill: var(--pos3-c); }
+.seg-3 { fill: var(--grey-mid); }
+.seg-4 { fill: var(--pos5-c); }
+.seg-5 { fill: var(--grey-lo); }
+.seg-6 { fill: var(--line-strong); }
+
+/* The wins go blue when the card has your attention */
+.player-card:hover .pie-seg.seg-1,
+.player-card:focus-within .pie-seg.seg-1,
+.player-card:hover .pie-swatch.seg-1,
+.player-card:focus-within .pie-swatch.seg-1 { fill: var(--blue); background: var(--blue); }
+
+.pie-legend { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 0; }
+
+.pie-key {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--grey-mid);
+  line-height: 1.4;
+}
+
+.pie-swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: background 0.4s var(--ease);
+}
+
+.pie-swatch.seg-1 { background: var(--paper); }
+.pie-swatch.seg-2 { background: var(--pos3-c); }
+.pie-swatch.seg-3 { background: var(--grey-mid); }
+.pie-swatch.seg-4 { background: var(--pos5-c); }
+.pie-swatch.seg-5 { background: var(--grey-lo); }
+.pie-swatch.seg-6 { background: var(--line-strong); }
+
+.pie-key-label { width: 3ch; }
+.pie-key-count { margin-left: auto; color: var(--paper); font-weight: 600; }
 
 .spark-caption {
   font-family: var(--font-mono);
@@ -580,6 +640,23 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
    ========================================================================== */
 
 /* Compact year grid — wraps forever, every season one tap, no dropdown */
+.section-head-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.season-year {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.04em;
+  color: var(--grey-lo);
+  line-height: 1;
+  padding-top: 0.4rem;
+}
+
 .season-grid {
   display: flex;
   flex-wrap: wrap;
