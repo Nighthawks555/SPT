@@ -208,6 +208,53 @@
       "</svg>";
   }
 
+  /* All-time placings pie — SVG wedges, greyscale ramp (brightest =
+     1sts), 1st wedge turns blue on card hover via CSS. Legend carries
+     the actual counts. */
+  var ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
+
+  function pieWedge(cx, cy, r, a0, a1) {
+    var x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+    var x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    var large = (a1 - a0) > Math.PI ? 1 : 0;
+    return "M" + cx + "," + cy + " L" + x0.toFixed(2) + "," + y0.toFixed(2) +
+      " A" + r + "," + r + " 0 " + large + " 1 " + x1.toFixed(2) + "," + y1.toFixed(2) + " Z";
+  }
+
+  function placingPieHTML(placings) {
+    var total = placings.reduce(function (s, v) { return s + v; }, 0);
+    if (!total) return "";
+    var a = -Math.PI / 2; // start at 12 o'clock
+    var wedges = "";
+    for (var i = 0; i < placings.length; i++) {
+      if (!placings[i]) continue;
+      var sweep = (placings[i] / total) * Math.PI * 2;
+      // A full-circle single wedge won't draw as one arc; use two halves
+      if (sweep >= Math.PI * 2 - 0.0001) {
+        wedges += '<circle class="pie-seg seg-' + (i + 1) + '" cx="50" cy="50" r="48"><title>' +
+          ORDINALS[i] + " · " + placings[i] + "</title></circle>";
+      } else {
+        wedges += '<path class="pie-seg seg-' + (i + 1) + '" d="' + pieWedge(50, 50, 48, a, a + sweep) +
+          '"><title>' + ORDINALS[i] + " · " + placings[i] + "</title></path>";
+      }
+      a += sweep;
+    }
+    var legend = placings.map(function (v, i) {
+      return '<div class="pie-key"><span class="pie-swatch seg-' + (i + 1) + '"></span>' +
+        '<span class="pie-key-label">' + ORDINALS[i] + '</span>' +
+        '<span class="pie-key-count">' + fmt(v) + "</span></div>";
+    }).join("");
+    return (
+      '<div class="placings">' +
+        '<div class="placings-label">All-time placings</div>' +
+        '<div class="placings-chart">' +
+          '<svg class="placings-pie" viewBox="0 0 100 100" aria-hidden="true">' + wedges + "</svg>" +
+          '<div class="pie-legend">' + legend + "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
   function initials(name) {
     return name.split(/[\s-]+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
   }
@@ -291,6 +338,7 @@
         ? sparkline(hist) +
           '<div class="spark-caption"><span>SPT1</span><span>SPT' + hist.length + "</span></div>"
         : "";
+      var pieBlock = placingPieHTML(p.placings);
       return (
         '<article class="player-card" tabindex="0">' +
           avatarHTML(name) +
@@ -304,6 +352,7 @@
             '<div class="card-stat"><span class="v">' + fmt(p.placings[0]) + '</span><span class="k">1st</span></div>' +
           "</div>" +
           sparkBlock +
+          pieBlock +
         "</article>"
       );
     }).join("");
@@ -698,6 +747,11 @@
       for (var i = 0; i < pills.length; i++) {
         pills[i].setAttribute("aria-pressed",
           parseInt(pills[i].getAttribute("data-season"), 10) === idx ? "true" : "false");
+      }
+      var yearEl = document.getElementById("season-year");
+      if (yearEl) {
+        var no = parseInt(site.seasons[idx].replace(/\D/g, ""), 10);
+        yearEl.textContent = no ? String(2004 + no) : "";
       }
       renderSeasonGames(gamesData, site.seasons[idx]);
       renderSeasonStandings(lb, site, idx, gamesData);
