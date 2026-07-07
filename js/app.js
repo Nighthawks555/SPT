@@ -127,11 +127,16 @@
       var name = (r[0] || "").trim();
       if (!name) continue;
       if (/^substitutes$/i.test(name)) { pastMarker = true; continue; }
+      var rounds = [];
+      for (var k = 0; k < 10; k++) {
+        rounds.push({ tp: num(r[1 + 2 * k]), w: num(r[2 + 2 * k]) });
+      }
       var p = {
         name: name,
         total: num(r[21]),
         games: num(r[29]),
         ppg: num(r[30]),
+        rounds: rounds,
         placings: [num(r[23]), num(r[24]), num(r[25]), num(r[26]), num(r[27]), num(r[28])]
       };
       // Guard against stray header text reaching this point
@@ -313,6 +318,104 @@
   /* ------------------------------------------------------------------
      Renderers
      ------------------------------------------------------------------ */
+  /* League tiebreak: countback on positions. Equal points resolve by
+     most 1sts that season, then most 2nds, and so on. Position counts
+     come from the games data; without it, points stand alone. */
+  function positionCountsFor(seasonGames) {
+    if (!seasonGames || !seasonGames.majors.length) return null;
+    var counts = {};
+    seasonGames.majors.forEach(function (p) { counts[p.name] = [0, 0, 0, 0, 0, 0]; });
+    for (var g = 0; g < 10; g++) {
+      var pool = rankPoolFor(seasonGames, g);
+      seasonGames.majors.forEach(function (p) {
+        var pos = positionIn(g, p, pool);
+        if (pos !== null) counts[p.name][Math.min(pos, 6) - 1]++;
+      });
+    }
+    return counts;
+  }
+
+  function countbackCompare(a, b, counts) {
+    if (b.points !== a.points) return b.points - a.points;
+    if (!counts || !counts[a.name] || !counts[b.name]) return 0;
+    for (var i = 0; i < 6; i++) {
+      if (counts[a.name][i] !== counts[b.name][i]) {
+        return counts[b.name][i] - counts[a.name][i];
+      }
+    }
+    return 0;
+  }
+
+  function sortWithCountback(rows, counts) {
+    return rows.slice().sort(function (a, b) { return countbackCompare(a, b, counts); });
+  }
+
+  function majorsStandingsFor(lb, site, seasonIdx, gamesData) {
+    var coreNames = lb.core.map(function (p) { return p.name; });
+    var seen = {};
+    var majors = standingsFor(site, seasonIdx).filter(function (r) {
+      if (coreNames.indexOf(r.name) === -1 || seen[r.name]) return false;
+      seen[r.name] = true;
+      return true;
+    });
+    var counts = gamesData ? positionCountsFor(gamesData[site.seasons[seasonIdx]]) : null;
+    return { rows: sortWithCountback(majors, counts), counts: counts };
+  }
+
+  /* Championships — top major of every COMPLETED season after
+     countback. The current season's leader isn't a champion yet.
+     Returns { name: [seasonIdx] } */
+  function computeChampionships(lb, site, gamesData) {
+    var champs = {};
+    for (var idx = 0; idx < site.seasons.length - 1; idx++) {
+      var st = majorsStandingsFor(lb, site, idx, gamesData);
+      if (st.rows.length) {
+        var top = st.rows[0].name;
+        (champs[top] = champs[top] || []).push(idx);
+      }
+    }
+    return champs;
+  }
+
+  function seasonYear(seasonName) {
+    var no = parseInt(String(seasonName).replace(/\D/g, ""), 10);
+    return no ? String(2004 + no) : "";
+  }
+
+  function openChampionships(playerName, lb, site, gamesData) {
+    var modal = ensureModal();
+    var body = document.getElementById("pics-body");
+    var champs = computeChampionships(lb, site, gamesData)[playerName] || [];
+    document.getElementById("pics-title").textContent =
+      playerName + " \u00b7 " + champs.length + (champs.length === 1 ? " Championship" : " Championships");
+    modal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+    if (!champs.length) {
+      body.innerHTML = '<p class="pics-note">No titles yet. The felt is long.</p>';
+      return;
+    }
+    body.innerHTML = champs.map(function (idx) {
+      var majors = majorsStandingsFor(lb, site, idx, gamesData).rows;
+      var rows = majors.map(function (r, i) {
+        return (
+          '<li class="standing-row' + (i === 0 ? " is-champ" : "") + '">' +
+            '<span class="standing-rank">' + (i + 1) + "</span>" +
+            '<span class="standing-name">' + displayName(r.name) +
+              (i === 0 ? '<span class="champ-badge">Champion</span>' : "") + "</span>" +
+            '<span class="standing-points">' + fmt(r.points) + "</span>" +
+          "</li>"
+        );
+      }).join("");
+      return (
+        '<div class="champ-season">' +
+          '<div class="champ-season-head"><span>' + site.seasons[idx] + "</span>" +
+          '<span class="champ-season-year">' + seasonYear(site.seasons[idx]) + "</span></div>" +
+          '<div class="season-panel"><ol class="season-standings">' + rows + "</ol></div>" +
+        "</div>"
+      );
+    }).join("");
+  }
+
   function renderHeroStats(lb, site) {
     var seasons = site.seasons.length;
     var allPlayers = lb.core.length + lb.subs.length;
@@ -324,10 +427,11 @@
     el.querySelector('[data-stat="points"]').textContent = fmt(totalPoints);
   }
 
-  function renderFeatureCards(lb, site) {
+  function renderFeatureCards(lb, site, gamesData) {
     var host = document.getElementById("feature-cards");
     if (!host) return;
     var ranked = lb.core.slice().sort(function (a, b) { return b.total - a.total; });
+    var champMap = computeChampionships(lb, site, gamesData);
     var html = THE_FIVE.map(function (name) {
       var p = null;
       for (var i = 0; i < lb.core.length; i++) if (lb.core[i].name === name) { p = lb.core[i]; break; }
@@ -339,6 +443,9 @@
           '<div class="spark-caption"><span>SPT1</span><span>SPT' + hist.length + "</span></div>"
         : "";
       var pieBlock = placingPieHTML(p.placings);
+      var nChamps = (champMap[name] || []).length;
+      var champBtn = '<button type="button" class="champ-btn" data-player="' + name + '">' +
+        nChamps + (nChamps === 1 ? " Championship" : " Championships") + "</button>";
       return (
         '<article class="player-card" tabindex="0">' +
           avatarHTML(name) +
@@ -353,6 +460,7 @@
           "</div>" +
           sparkBlock +
           pieBlock +
+          champBtn +
         "</article>"
       );
     }).join("");
@@ -645,13 +753,14 @@
     if (!host) return;
     var coreNames = lb.core.map(function (p) { return p.name; });
     var all = standingsFor(site, seasonIdx);
-    var majors = [], subs = [];
+    var subs = [];
     var seenCore = {};
     for (var i = 0; i < all.length; i++) {
       var isCore = coreNames.indexOf(all[i].name) !== -1 && !seenCore[all[i].name];
-      if (isCore) { majors.push(all[i]); seenCore[all[i].name] = true; }
+      if (isCore) { seenCore[all[i].name] = true; }
       else subs.push(all[i]);
     }
+    var majors = majorsStandingsFor(lb, site, seasonIdx, gamesData).rows;
     var isCurrent = seasonIdx === site.seasons.length - 1;
     if (!majors.length) {
       host.innerHTML = '<li class="loading-note">No results on the board for ' +
@@ -736,6 +845,81 @@
     var row = e.target.closest ? e.target.closest(".standing-click") : null;
     if (row) { e.preventDefault(); toggleSubHighlight(row); }
   });
+
+  /* Season Positions — every season's final tally in one matrix.
+     Rows = seasons (with year), columns = the majors. Champions of
+     completed seasons take the blue; the live season stays neutral. */
+  function renderSeasonMatrix(lb, site, gamesData) {
+    var table = document.getElementById("history-table");
+    if (!table) return;
+    var majors = lb.core; // databook order: the five, Phantom, Joker
+    var head = "<tr><th scope=\"col\" class=\"game-meta-h\">Season</th>" +
+      majors.map(function (p) { return '<th scope="col">' + displayName(p.name) + "</th>"; }).join("") +
+      "</tr>";
+    var coreNames = majors.map(function (p) { return p.name; });
+    var latest = site.seasons.length - 1;
+
+    var rows = site.seasons.map(function (seasonName, idx) {
+      var st = majorsStandingsFor(lb, site, idx, gamesData);
+      var standings = st.rows;
+      var byName = {};
+      standings.forEach(function (r) {
+        var above = standings.filter(function (o) {
+          return countbackCompare(o, r, st.counts) < 0;
+        }).length;
+        byName[r.name] = { pos: above + 1, points: r.points };
+      });
+      var isCurrent = idx === latest;
+      var meta = '<th scope="row" class="game-meta">' +
+        '<span class="game-name">' + seasonName + "</span>" +
+        '<span class="game-venue">' + seasonYear(seasonName) +
+          (isCurrent ? " \u00b7 in progress" : "") + "</span>" +
+        "</th>";
+      var cells = majors.map(function (p) {
+        var r = byName[p.name];
+        if (!r) return '<td class="pos-cell pos-none">\u2014</td>';
+        var cls = r.pos === 1 && !isCurrent ? "pos-1" : "pos-" + Math.min(r.pos, 6);
+        if (r.pos === 1 && isCurrent) cls = "pos-2"; // leading, not yet champion
+        return '<td class="pos-cell ' + cls + '">' +
+          '<span class="pos-ord">' + ordinal(r.pos) + "</span>" +
+          '<span class="pos-pts">' + fmt(r.points) + " pts</span>" +
+          "</td>";
+      }).join("");
+      return "<tr>" + meta + cells + "</tr>";
+    }).join("");
+
+    table.innerHTML = "<thead>" + head + "</thead><tbody>" + rows + "</tbody>";
+  }
+
+  /* Composite rounds — all-time points per round number, straight
+     from the databook's per-round columns. Best total in each round
+     takes the blue. */
+  function renderRoundMatrix(lb) {
+    var table = document.getElementById("rounds-table");
+    if (!table) return;
+    var majors = lb.core;
+    var head = "<tr><th scope=\"col\" class=\"game-meta-h\">Round</th>" +
+      majors.map(function (p) { return '<th scope="col">' + displayName(p.name) + "</th>"; }).join("") +
+      "</tr>";
+    var rows = "";
+    for (var r = 0; r < 10; r++) {
+      var best = Math.max.apply(null, majors.map(function (p) { return p.rounds[r].tp; }));
+      var meta = '<th scope="row" class="game-meta">' +
+        '<span class="game-name">Round ' + (r + 1) + "</span>" +
+        "</th>";
+      var cells = majors.map(function (p) {
+        var d = p.rounds[r];
+        if (!d.tp && !d.w) return '<td class="pos-cell pos-none">\u2014</td>';
+        var isBest = d.tp === best && best > 0;
+        return '<td class="pos-cell' + (isBest ? " round-best" : "") + '">' +
+          '<span class="pos-ord">' + fmt(d.tp) + "</span>" +
+          '<span class="pos-pts">' + fmt(d.w) + (d.w === 1 ? " win" : " wins") + "</span>" +
+          "</td>";
+      }).join("");
+      rows += "<tr>" + meta + cells + "</tr>";
+    }
+    table.innerHTML = "<thead>" + head + "</thead><tbody>" + rows + "</tbody>";
+  }
 
   function renderSeasons(lb, site, gamesData) {
     var pillsHost = document.getElementById("season-pills");
@@ -898,6 +1082,14 @@
     });
   }
 
+  var bootData = null;
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".champ-btn");
+    if (!btn || !bootData) return;
+    openChampionships(btn.getAttribute("data-player"), bootData.lb, bootData.site, bootData.gamesData);
+  });
+
   /* Theme toggle — light/dark, remembered between visits */
   document.addEventListener("click", function (e) {
     var btn = e.target.closest(".theme-toggle");
@@ -951,12 +1143,15 @@
       var site = parseSite(results[1]);
       var gamesData = results[2] ? parseGames(results[2]) : null;
       var playerMeta = results[3] || {};
+      bootData = { lb: lb, site: site, gamesData: gamesData };
       var page = document.body.getAttribute("data-page");
       if (page === "dashboard") {
         renderHeroStats(lb, site);
-        renderFeatureCards(lb, site);
+        renderFeatureCards(lb, site, gamesData);
         renderLeaderboardTable(lb, site);
         renderSeasons(lb, site, gamesData);
+        renderSeasonMatrix(lb, site, gamesData);
+        renderRoundMatrix(lb);
       } else if (page === "players") {
         renderOGs(lb, site, playerMeta);
         renderPastSeats(lb, site, playerMeta);
