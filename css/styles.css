@@ -440,6 +440,41 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 .pie-key-label { width: 3ch; }
 .pie-key-count { margin-left: auto; color: var(--paper); font-weight: 600; }
 
+.champ-btn {
+  width: 100%;
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f3f3f4;
+  background: var(--blue);
+  border: none;
+  border-radius: calc(var(--radius) / 2);
+  padding: 0.7rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.champ-btn:hover, .champ-btn:focus-visible { background: #3f6cd6; transform: translateY(-1px); }
+.champ-btn:active { transform: translateY(0); }
+
+.champ-season + .champ-season { margin-top: 1.25rem; }
+
+.champ-season-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.champ-season-year { color: var(--grey-lo); font-weight: 500; }
+
 .spark-caption {
   font-family: var(--font-mono);
   font-size: 0.6rem;
@@ -778,6 +813,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
 .pos-6 .pos-ord { color: var(--grey-lo); }
 .pos-none { color: var(--grey-lo); }
 
+.pos-cell.round-best .pos-ord { color: var(--blue); }
+.pos-cell.round-best { box-shadow: inset 0 2px 0 var(--blue); background: var(--blue-soft); }
+
 .pos-cell.cell-hint { background: var(--hint-bg); box-shadow: inset 0 0 0 1px var(--line-strong); }
 
 .standing-click { cursor: pointer; }
@@ -870,19 +908,31 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
   font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--grey-mid);
-  background: transparent;
-  border: 1px solid var(--line-strong);
+  color: var(--paper);
+  background: var(--line-strong);   /* solid grey — pics inside */
+  border: 1px solid transparent;
   border-radius: 100px;
   padding: 0.2rem 0.6rem;
   cursor: pointer;
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), opacity 0.2s var(--ease);
 }
 
-.pics-btn:hover, .pics-btn:focus-visible { color: var(--blue); border-color: var(--blue); }
+.pics-btn:hover, .pics-btn:focus-visible { color: #f3f3f4; background: var(--blue); }
 
-.pics-btn-empty { opacity: 0.5; }
-.pics-btn-empty:hover, .pics-btn-empty:focus-visible { opacity: 0.8; color: var(--grey-mid); border-color: var(--line-strong); }
+/* No pics yet — faint outline, clearly inactive */
+.pics-btn-empty {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--grey-mid);
+  opacity: 0.5;
+}
+
+.pics-btn-empty:hover, .pics-btn-empty:focus-visible {
+  opacity: 0.85;
+  background: transparent;
+  color: var(--grey-mid);
+  border-color: var(--line-strong);
+}
 
 .pics-modal {
   position: fixed;
