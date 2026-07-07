@@ -318,6 +318,16 @@
   /* ------------------------------------------------------------------
      Renderers
      ------------------------------------------------------------------ */
+  /* The Reads — written from the record: totals, placings, round
+     strengths, and title history across twenty-two seasons. */
+  var PROFILES = {
+    "Concierge": "The cruellest stat in SPT: forty-nine game wins \u2014 more than anyone, ever \u2014 and only three championships to show for it. Concierge is the great sprinter of the group, owner of Round 10 outright with nine closing-night victories and 131 points; when the season finale arrives, he is the most dangerous man at the table. But titles are marathons, and somewhere in the middle rounds the engine idles. Second all-time on points, first in single-night brilliance, perpetually betrayed by the long game. Wins the battles. Bleeds the wars. The trophy cabinet remains unjust.",
+    "Doctor": "Ten last places in over two hundred games. Read that again. While others explode, Doctor simply refuses to \u2014 the lowest catastrophe rate at the table, converted patiently into five championships including the SPT19\u201321 three-peat, the only dynasty of the modern era. He does not chase; he accumulates. He lost the 2018 title on a countback and answered with three straight. The record suggests a man who plays the season, not the hand \u2014 a surgeon who never operates angry. Currently mid-pack in SPT22, which history suggests is exactly where he wants you looking.",
+    "Dyna-mite": "The name is accurate: Dyna-mite detonates in clusters. Four titles, all packed into 2015\u20132019 \u2014 including the 2018 championship stolen on countback, fifty-nine points apiece, settled by second places. He owns Round 1 with 125 points, the fastest starter in SPT history, and holds the record for third places (forty-eight), the residue of a hundred nights that started hot and cooled late. When Dyna-mite peaks, he takes seasons in bunches; when he doesn't, he podiums politely. Six years without a title now. The fuse, presumably, is being re-lit.",
+    "Ices": "One championship in twenty-one completed seasons \u2014 and yet, somehow, never embarrassed. Ices holds the fewest game wins of the five (twenty-eight) alongside a mountain of near-misses: forty-six thirds, forty-five fourths, the largest mid-table haul in SPT history. Only sixteen last places says he rarely donates; only one title says he rarely collects. He is the table's rock \u2014 present, solvent, impossible to eliminate, eternally third. The pie chart is a doughnut of patience. Every dynasty of the last two decades was built on points quietly taken off everyone except Ices.",
+    "Smooth": "Eight championships. Nearly double the next man. Smooth won the first three seasons ever played, has the most all-time points, the best points-per-game \u2014 and the most last places, twenty-two of them. That is not a contradiction; that is the philosophy. All gas, no fold, maximum variance: the same approach that produces forty-six firsts produces the sixths, and Smooth has clearly decided the exchange rate is favourable. Two decades in, he leads SPT22, hunting title nine. The rest of the table has spent twenty-one years regretting letting him win early. The habit stuck."
+  };
+
   /* League tiebreak: countback on positions. Equal points resolve by
      most 1sts that season, then most 2nds, and so on. Position counts
      come from the games data; without it, points stand alone. */
@@ -382,19 +392,51 @@
     return no ? String(2004 + no) : "";
   }
 
-  function openChampionships(playerName, lb, site, gamesData) {
+  function openPlayerProfile(playerName, lb, site, gamesData, playerMeta) {
     var modal = ensureModal();
     var body = document.getElementById("pics-body");
     var champs = computeChampionships(lb, site, gamesData)[playerName] || [];
-    document.getElementById("pics-title").textContent =
-      playerName + " \u00b7 " + champs.length + (champs.length === 1 ? " Championship" : " Championships");
+    var p = null;
+    for (var i = 0; i < lb.core.length; i++) if (lb.core[i].name === playerName) { p = lb.core[i]; break; }
+    if (!p) return;
+    var ranked = lb.core.slice().sort(function (a, b) { return b.total - a.total; });
+    var rank = ranked.indexOf(p) + 1;
+    var m = metaFor(playerMeta, playerName);
+    var first = m.firstPlayed || firstSeasonFor(site, playerName);
+    document.getElementById("pics-title").textContent = playerName;
     modal.classList.add("is-open");
     document.body.style.overflow = "hidden";
-    if (!champs.length) {
-      body.innerHTML = '<p class="pics-note">No titles yet. The felt is long.</p>';
-      return;
-    }
-    body.innerHTML = champs.map(function (idx) {
+
+    var details =
+      '<div class="prof-head">' +
+        '<div class="prof-photo"><img src="' + photoURL(playerName) + '" alt="" ' +
+          "onerror=\"this.parentNode.textContent='" + initials(playerName) + "'\"></div>" +
+        '<div class="prof-facts">' +
+          '<div class="prof-title">' + playerName + "</div>" +
+          (m.realName ? '<div class="prof-real">' + m.realName + "</div>" : "") +
+          '<div class="prof-meta">All-time #' + rank + (first ? " \u00b7 First played " + first : "") + "</div>" +
+          '<div class="prof-stats">' +
+            '<span><b>' + fmt(p.total) + "</b> pts</span>" +
+            '<span><b>' + fmt(p.games) + "</b> games</span>" +
+            '<span><b>' + p.ppg.toFixed(2) + "</b> ppg</span>" +
+            '<span><b>' + champs.length + "</b> " + (champs.length === 1 ? "title" : "titles") + "</span>" +
+          "</div>" +
+          '<div class="prof-placings">' + p.placings.map(function (v, i) {
+            return ORDINALS[i] + " " + fmt(v);
+          }).join(" \u00b7 ") + "</div>" +
+        "</div>" +
+      "</div>";
+
+    var read = PROFILES[playerName]
+      ? '<div class="prof-read"><div class="prof-read-label">The Read</div><p>' + PROFILES[playerName] + "</p></div>"
+      : "";
+
+    var champHead = champs.length
+      ? '<div class="prof-read-label prof-champ-label">' + champs.length +
+        (champs.length === 1 ? " Championship" : " Championships") + "</div>"
+      : '<p class="pics-note">No titles yet. The felt is long.</p>';
+
+    body.innerHTML = details + read + champHead + champs.map(function (idx) {
       var majors = majorsStandingsFor(lb, site, idx, gamesData).rows;
       var rows = majors.map(function (r, i) {
         return (
@@ -444,10 +486,11 @@
         : "";
       var pieBlock = placingPieHTML(p.placings);
       var nChamps = (champMap[name] || []).length;
-      var champBtn = '<button type="button" class="champ-btn" data-player="' + name + '">' +
-        nChamps + (nChamps === 1 ? " Championship" : " Championships") + "</button>";
+      var champBtn = '<span class="champ-btn" aria-hidden="true">' +
+        nChamps + (nChamps === 1 ? " Championship" : " Championships") + "</span>";
       return (
-        '<article class="player-card" tabindex="0">' +
+        '<article class="player-card card-clickable" tabindex="0" role="button" data-player="' + name + '"' +
+          ' aria-label="' + name + ' \u2014 open profile">' +
           avatarHTML(name) +
           "<div>" +
             '<h3 class="player-name">' + name + "</h3>" +
@@ -1084,10 +1127,21 @@
 
   var bootData = null;
 
+  function handleProfileOpen(el) {
+    if (!bootData) return;
+    openPlayerProfile(el.getAttribute("data-player"),
+      bootData.lb, bootData.site, bootData.gamesData, bootData.playerMeta);
+  }
+
   document.addEventListener("click", function (e) {
-    var btn = e.target.closest(".champ-btn");
-    if (!btn || !bootData) return;
-    openChampionships(btn.getAttribute("data-player"), bootData.lb, bootData.site, bootData.gamesData);
+    var card = e.target.closest(".card-clickable[data-player]");
+    if (card) handleProfileOpen(card);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    var card = e.target.closest ? e.target.closest(".card-clickable[data-player]") : null;
+    if (card) { e.preventDefault(); handleProfileOpen(card); }
   });
 
   /* Theme toggle — light/dark, remembered between visits */
@@ -1143,7 +1197,7 @@
       var site = parseSite(results[1]);
       var gamesData = results[2] ? parseGames(results[2]) : null;
       var playerMeta = results[3] || {};
-      bootData = { lb: lb, site: site, gamesData: gamesData };
+      bootData = { lb: lb, site: site, gamesData: gamesData, playerMeta: playerMeta };
       var page = document.body.getAttribute("data-page");
       if (page === "dashboard") {
         renderHeroStats(lb, site);
