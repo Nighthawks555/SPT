@@ -61,7 +61,6 @@
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 0;
     padding: 0 24px;
     height: 52px;
   }
@@ -127,9 +126,7 @@
     color: var(--text);
     margin-bottom: 8px;
   }
-  .hero-cup {
-    color: var(--accent);
-  }
+  .hero-cup { color: var(--accent); }
   .hero-sub {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -138,12 +135,7 @@
     color: var(--text-muted);
     margin-bottom: 48px;
   }
-  .hero-stats {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    flex-wrap: wrap;
-  }
+  .hero-stats { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
   .hero-stat { text-align: center; }
   .hero-stat-value {
     font-family: var(--font-mono);
@@ -161,7 +153,6 @@
     margin-top: 4px;
   }
 
-  /* LAST TOURNAMENT */
   .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
   .section-header {
     display: flex;
@@ -196,57 +187,60 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px 20px;
-    text-align: center;
-    position: relative;
     overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
   }
-  .podium-card.pos-1 {
-    border-color: var(--gold);
-    background: linear-gradient(180deg, rgba(244,200,66,0.05) 0%, var(--bg-card) 100%);
+  .podium-card:hover { border-color: var(--border-strong); }
+  .podium-card.pos-1 { border-color: var(--gold); }
+  .podium-card.pos-2 { border-color: var(--silver); }
+  .podium-card.pos-3 { border-color: var(--bronze); }
+  .podium-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    background: var(--bg-card-2);
   }
-  .podium-card.pos-2 {
-    border-color: var(--silver);
-    background: linear-gradient(180deg, rgba(192,192,192,0.04) 0%, var(--bg-card) 100%);
+  .podium-photo-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--bg-card-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
   }
-  .podium-card.pos-3 {
-    border-color: var(--bronze);
-    background: linear-gradient(180deg, rgba(205,127,50,0.04) 0%, var(--bg-card) 100%);
-  }
+  .podium-body { padding: 16px 18px 20px; }
   .podium-pos {
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    font-size: 10px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
   .pos-1 .podium-pos { color: var(--gold); }
   .pos-2 .podium-pos { color: var(--silver); }
   .pos-3 .podium-pos { color: var(--bronze); }
-  .podium-name {
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .podium-moniker {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-muted);
-  }
+  .podium-name { font-weight: 700; font-size: 18px; color: var(--text); margin-bottom: 2px; }
+  .podium-moniker { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
 
-  /* BEST PLAYER STATS */
+  /* BEST STATS */
   .best-stat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
     margin-bottom: 48px;
   }
   .best-stat-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 18px;
   }
   .best-stat-label {
     font-family: var(--font-mono);
@@ -254,65 +248,12 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-  .best-stat-name {
-    font-weight: 700;
-    font-size: 16px;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  .best-stat-moniker {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
     margin-bottom: 8px;
   }
-  .best-stat-value {
-    font-family: var(--font-mono);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-  .best-stat-unit {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-left: 4px;
-  }
-
-  /* YEAR-BY-YEAR TABLE */
-  .table-wrap { overflow-x: auto; margin-bottom: 48px; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
-  th {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-    white-space: nowrap;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--bg-card-2); }
-  .td-pos { font-weight: 700; color: var(--accent); min-width: 36px; }
-  .td-gold { color: var(--gold); font-weight: 700; }
-  .td-silver { color: var(--silver); }
-  .td-bronze { color: var(--bronze); }
-  .td-dnp { color: var(--text-dim); }
-  .td-name { font-family: var(--font-sans); font-size: 13px; font-weight: 600; min-width: 140px; }
-  .td-mono { font-family: var(--font-mono); color: var(--text-muted); }
+  .best-stat-name { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 1px; }
+  .best-stat-moniker { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .best-stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--accent); }
+  .best-stat-unit { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
 
   /* CHAMPIONS ROLL */
   .champions-grid {
@@ -325,42 +266,154 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px 18px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
-  .champion-year {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-    min-width: 42px;
+  .champion-year { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent); min-width: 40px; }
+  .champion-name { font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.2; }
+  .champion-moniker { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .champion-trophy { margin-left: auto; font-size: 16px; opacity: 0.6; }
+
+  /* CUP RESULTS TABS */
+  .cup-tabs-wrap { margin-bottom: 48px; }
+  .cup-tab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
   }
-  .champion-info {}
-  .champion-name {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text);
-    line-height: 1.2;
+  .cup-tab-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
-  .champion-moniker {
+  .cup-tab-btn {
     font-family: var(--font-mono);
     font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-muted);
-    margin-top: 2px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
   }
-  .champion-trophy {
-    margin-left: auto;
-    font-size: 18px;
-    opacity: 0.7;
-  }
+  .cup-tab-btn:hover { color: var(--text); background: var(--bg-card); border-color: var(--border-strong); }
+  .cup-tab-btn.active { color: var(--accent); background: var(--accent-dim); border-color: var(--accent); }
+  .cup-tab-panel { display: none; }
+  .cup-tab-panel.active { display: block; }
 
-  /* PLAYERS PAGE */
+  .tournament-photos-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tournament-photos-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+  /* CUP RESULTS TABLE */
+  .cup-results-table { width: 100%; border-collapse: collapse; }
+  .cup-results-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+  .cup-results-table td {
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .cup-results-table tr:last-child td { border-bottom: none; }
+  .cup-row-inner {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 12px;
+  }
+  .cup-row-gold { background: var(--gold); }
+  .cup-row-gold .cup-pos-cell,
+  .cup-row-gold .cup-name-cell,
+  .cup-row-gold .cup-moniker-cell { color: #111 !important; }
+  .cup-row-gold .place-btn { color: #111; border-color: rgba(0,0,0,0.2); }
+  .cup-row-gold .place-btn:hover { background: rgba(0,0,0,0.1); }
+  .cup-row-silver { background: rgba(192,192,192,0.18); }
+  .cup-row-silver .cup-pos-cell { color: var(--silver); }
+  .cup-row-bronze { background: rgba(205,127,50,0.12); }
+  .cup-row-bronze .cup-pos-cell { color: var(--bronze); }
+  .cup-results-table tr:hover .cup-row-inner:not(.cup-row-gold) { background: var(--bg-card-2); }
+  .cup-pos-cell { font-weight: 700; min-width: 44px; color: var(--text); }
+  .cup-name-cell {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .cup-name-cell:hover { text-decoration: underline; }
+  .cup-moniker-cell { color: var(--text-muted); min-width: 100px; }
+  .place-btn {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    display: inline-block;
+  }
+  .place-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-card-2); }
+
+  /* TABLE WRAP */
+  .table-wrap { overflow-x: auto; margin-bottom: 48px; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
+  th { padding: 10px 12px; text-align: left; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg-card-2); }
+
+  /* PLAYERS PAGE - SPT card style */
   .players-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
     padding-top: 32px;
     padding-bottom: 48px;
   }
@@ -368,72 +421,350 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .player-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+  .player-card.is-winner { border-color: rgba(244,200,66,0.3); }
+  .player-photo-wrap {
+    width: 100%;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    background: var(--bg-card-2);
+    position: relative;
+  }
+  .player-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(30%);
+  }
+  .player-photo-placeholder {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
-    gap: 14px;
-    transition: border-color 0.15s;
-  }
-  .player-card:hover { border-color: var(--border-strong); }
-  .player-card.is-winner { border-color: rgba(244,200,66,0.3); }
-  .player-rank {
+    justify-content: center;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 28px;
     color: var(--text-dim);
-    min-width: 22px;
-    text-align: right;
+    background: var(--bg-card-2);
   }
-  .player-info { flex: 1; min-width: 0; }
-  .player-name {
+  .player-card-body { padding: 14px 14px 16px; }
+  .player-moniker-large {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    line-height: 1.2;
   }
-  .player-moniker {
+  .player-rank-label {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--text-muted);
-    margin-top: 2px;
+    margin-bottom: 12px;
   }
-  .player-stats { text-align: right; }
-  .player-avg {
+  .player-card-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .player-card-stat { }
+  .player-card-stat-value {
     font-family: var(--font-mono);
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text);
     display: block;
   }
-  .player-meta {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
-  .winner-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(244,200,66,0.1);
-    border: 1px solid rgba(244,200,66,0.3);
-    color: var(--gold);
+  .player-card-stat-label {
     font-family: var(--font-mono);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 2px 7px;
+    color: var(--text-muted);
+  }
+  .player-sparkline {
+    width: 100%;
+    height: 32px;
+    margin-bottom: 6px;
+  }
+  .player-sparkline-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .champ-btn {
+    width: 100%;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .champ-btn:hover { background: #a93226; }
+  .champ-btn-placeholder {
+    width: 100%;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 0;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-align: center;
+  }
+  .champ-btn-placeholder:hover { background: var(--bg-card-2); color: var(--text); }
+
+  /* PLAYER MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card-2);
+  }
+  .modal-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 24px; overflow-y: auto; max-height: 80vh; }
+  .modal-top {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .modal-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--bg-card-2);
+    flex-shrink: 0;
+  }
+  .modal-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 6px;
+    background: var(--bg-card-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .modal-info { flex: 1; min-width: 0; }
+  .modal-name { font-weight: 700; font-size: 22px; color: var(--text); margin-bottom: 2px; }
+  .modal-real-name { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .modal-meta-row {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .modal-stats-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .modal-stat { }
+  .modal-stat-val { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); }
+  .modal-stat-lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .modal-placings-row {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .modal-bio-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    margin-top: 4px;
+  }
+  .modal-bio {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  .modal-champ-callout {
+    background: rgba(192,57,43,0.12);
+    border: 1px solid rgba(192,57,43,0.4);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: #e74c3c;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .modal-section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    margin-top: 20px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-sparkline-wrap {
+    margin-bottom: 4px;
+  }
+  .modal-sparkline-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    margin-bottom: 16px;
+  }
+  .modal-season-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .modal-season-row:first-child { border-top: 1px solid var(--border); }
+  .modal-season-cup {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 80px;
+  }
+  .modal-season-name { flex: 1; font-size: 13px; color: var(--text); }
+  .modal-season-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
     border-radius: 100px;
-    margin-top: 6px;
+    background: rgba(244,200,66,0.15);
+    border: 1px solid rgba(244,200,66,0.4);
+    color: var(--gold);
+  }
+  .modal-season-pos {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 36px;
+    text-align: right;
+  }
+  .modal-season-pos.p1 { color: var(--gold); }
+  .modal-season-pos.p2 { color: var(--silver); }
+  .modal-season-pos.p3 { color: var(--bronze); }
+
+  /* PHOTO LIGHTBOX */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox-inner { position: relative; max-width: 90vw; max-height: 90vh; }
+  .lightbox img { max-width: 100%; max-height: 85vh; border-radius: 6px; display: block; }
+  .lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+  .lightbox-caption {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   /* UTIL */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 0;
-  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
   .loading {
     font-family: var(--font-mono);
     font-size: 12px;
@@ -456,87 +787,15 @@
     white-space: nowrap;
   }
 
-  /* YEAR RESULTS TABLE */
-  .year-results-table th, .year-results-table td {
-    padding: 8px 10px;
-  }
-  .year-cell {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  /* CUP RESULTS TABS */
-  .cup-tabs-wrap {
-    margin-bottom: 48px;
-  }
-  .cup-tab-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 12px;
-  }
-  .cup-tab-btn {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
-  }
-  .cup-tab-btn:hover {
-    color: var(--text);
-    background: var(--bg-card);
-    border-color: var(--border-strong);
-  }
-  .cup-tab-btn.active {
-    color: var(--accent);
-    background: var(--accent-dim);
-    border-color: var(--accent);
-  }
-  .cup-tab-panel { display: none; }
-  .cup-tab-panel.active { display: block; }
-  .cup-results-table { width: 100%; }
-  .cup-results-table th {
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-  }
-  .cup-results-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text);
-  }
-  .cup-results-table tr:last-child td { border-bottom: none; }
-  .cup-results-table tr:hover td { background: var(--bg-card-2); }
-  .cup-pos-cell { font-weight: 700; min-width: 40px; }
-  .cup-pos-1 { color: var(--gold); }
-  .cup-pos-2 { color: var(--silver); }
-  .cup-pos-3 { color: var(--bronze); }
-  .cup-name-cell { font-family: var(--font-sans); font-weight: 600; font-size: 13px; }
-  .cup-moniker-cell { color: var(--text-muted); }
-
   @media (max-width: 600px) {
     .hero-wordmark { font-size: 48px; }
     .podium { grid-template-columns: 1fr; }
     .hero-stats { gap: 24px; }
     nav { padding: 0 16px; }
     .container { padding: 0 16px; }
+    .players-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .modal-top { flex-direction: column; }
+    .modal-photo, .modal-photo-placeholder { width: 80px; height: 80px; }
   }
 </style>
 </head>
@@ -556,7 +815,6 @@
 <!-- DASHBOARD -->
 <section id="dashboard" class="active">
 
-  <!-- HERO -->
   <div class="hero">
     <div class="hero-wordmark">SPT <span class="hero-cup">CUP</span></div>
     <div class="hero-sub">Home game. Hard fought. Nine years running.</div>
@@ -613,8 +871,10 @@
       <span class="section-meta">Full finishing order by year</span>
     </div>
     <div class="cup-tabs-wrap">
-      <div class="cup-tab-bar" id="cup-tab-bar">
-        <div class="loading" style="padding:8px 0;">Loading cups...</div>
+      <div class="cup-tab-top">
+        <div class="cup-tab-bar" id="cup-tab-bar" style="border:none;padding:0;margin:0;flex-wrap:wrap;gap:4px;display:flex;">
+          <div class="loading" style="padding:8px 0;">Loading cups...</div>
+        </div>
       </div>
       <div id="cup-tab-panels">
         <div class="loading">Dealing cards...</div>
@@ -631,7 +891,7 @@
       <span class="section-title">All Players</span>
       <span class="section-meta" id="player-count">—</span>
     </div>
-    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:0;">Ranked by average placement (lower is better). Tiebreaker: most tournaments played.</p>
+    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:0;">Ranked by average placement. Lower is better.</p>
     <div class="players-grid" id="players-grid">
       <div class="loading" style="grid-column:1/-1">Loading players...</div>
     </div>
@@ -642,13 +902,44 @@
   <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;">SPT Cup — Data from <a href="https://docs.google.com/spreadsheets/d/1MlXF2rRCRJQK88KVHdDVrQgq9PB_KTIi3W0f4TYFnuM" target="_blank" style="color:var(--text-muted);text-decoration:none;">the databook</a> — Est. 2018</span>
 </footer>
 
+<!-- PLAYER PROFILE MODAL -->
+<div class="modal-overlay" id="playerModal" onclick="closeModal(event)">
+  <div class="modal" id="playerModalInner">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Player</span>
+      <button class="modal-close" onclick="closePlayerModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+    </div>
+  </div>
+</div>
+
+<!-- PHOTO LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+</div>
+
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 const SHEET_ID = '1MlXF2rRCRJQK88KVHdDVrQgq9PB_KTIi3W0f4TYFnuM';
 const YEARS = [2018,2019,2020,2021,2022,2023,2024,2025,2026];
+const CUP_NUMS = { 2018:1,2019:2,2020:3,2021:4,2022:5,2023:6,2024:7,2025:8,2026:9 };
+const CUP_FOLDER = { 2018:'SPT1',2019:'SPT2',2020:'SPT3',2021:'SPT4',2022:'SPT5',2023:'SPT6',2024:'SPT7',2025:'SPT8',2026:'SPT9' };
+
+// Global data cache
+let G_leaderData = [];
+let G_cupData = {}; // year -> array of {Position, Name, Moniker}
 
 function csvUrl(sheet) {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheet}`;
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}`;
+}
+
+function imgPath(folder, file) {
+  return `Images/${folder}/${file}`;
 }
 
 // ── CSV PARSER ───────────────────────────────────────────────────────────────
@@ -658,9 +949,9 @@ function parseCSV(text) {
   return lines.slice(1).map(line => {
     const vals = parseRow(line);
     const obj = {};
-    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
     return obj;
-  });
+  }).filter(r => Object.values(r).some(v => v));
 }
 function parseRow(line) {
   const result = [];
@@ -707,11 +998,159 @@ function ord(n) {
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
 
-// ── FORMAT AVG ───────────────────────────────────────────────────────────────
 function fmtAvg(v) {
   const n = parseFloat(v);
   if (isNaN(n)) return '—';
   return n % 1 === 0 ? n.toString() : n.toFixed(2);
+}
+
+// ── SPARKLINE SVG ────────────────────────────────────────────────────────────
+function sparklineSVG(values, w, h, color, dotColor) {
+  if (!values || values.length < 2) return '';
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const pad = 3;
+  const pts = values.map((v, i) => {
+    const x = pad + (i / (values.length - 1)) * (w - pad*2);
+    // Invert: lower placement = higher on chart
+    const y = pad + ((v - min) / range) * (h - pad*2);
+    return [x, y];
+  });
+  const path = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="overflow:visible">
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="2.5" fill="${dotColor}"/>
+  </svg>`;
+}
+
+// ── OPEN PHOTO ───────────────────────────────────────────────────────────────
+function openPhoto(src, caption) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxCaption').textContent = caption;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeLightbox(); closePlayerModal(); }
+});
+
+// ── PLAYER MODAL ─────────────────────────────────────────────────────────────
+function openPlayerModal(name) {
+  const player = G_leaderData.find(p => p.Name === name || p.Moniker === name);
+  if (!player) return;
+
+  document.getElementById('modalTitle').textContent = (player.Moniker || player.Name).toUpperCase();
+
+  const isWinner = player.Winner === 'YES';
+  const wins = parseInt(player.Wins) || (isWinner ? 1 : 0);
+  const firstTournamentLabel = ['Cup 1 (2018)','Cup 2 (2019)','Cup 3 (2020)','Cup 4 (2021)','Cup 5 (2022)','Cup 6 (2023)','Cup 7 (2024)','Cup 8 (2025)','Cup 9 (2026)'];
+  const ftIdx = parseInt(player.FirstTournament) - 1;
+  const ftLabel = firstTournamentLabel[ftIdx] || 'Cup ' + player.FirstTournament;
+
+  // Get this player's results across all cups
+  const seasonResults = YEARS.map(y => {
+    const cupRows = G_cupData[y] || [];
+    const found = cupRows.find(r => r.Name === player.Name);
+    return found ? { year: y, pos: +found.Position, cupNum: CUP_NUMS[y] } : null;
+  }).filter(Boolean).sort((a,b) => a.year - b.year);
+
+  const placements = seasonResults.map(r => r.pos);
+  const bestPlace = placements.length ? Math.min(...placements) : null;
+  const p1 = seasonResults.filter(r => r.pos === 1).length;
+  const p2 = seasonResults.filter(r => r.pos === 2).length;
+  const p3 = seasonResults.filter(r => r.pos === 3).length;
+
+  // Photo - use first cup played as profile photo
+  const firstYear = seasonResults.length ? seasonResults[0].year : null;
+  const firstFolder = firstYear ? CUP_FOLDER[firstYear] : null;
+  const photoSrc = firstFolder ? imgPath(firstFolder, `${seasonResults[0].pos}.jpg`) : null;
+
+  const photoEl = photoSrc
+    ? `<img class="modal-photo" src="${photoSrc}" alt="${player.Moniker}" onerror="this.outerHTML='<div class=\'modal-photo-placeholder\'>🃏</div>'">`
+    : `<div class="modal-photo-placeholder">🃏</div>`;
+
+  // Sparkline for modal (wider)
+  const spark = placements.length >= 2 ? sparklineSVG(placements, 400, 48, '#4a9eff', '#4a9eff') : '';
+
+  // Season rows
+  const seasonRows = seasonResults.map(r => {
+    let posClass = '';
+    if (r.pos === 1) posClass = 'p1';
+    else if (r.pos === 2) posClass = 'p2';
+    else if (r.pos === 3) posClass = 'p3';
+    return `<div class="modal-season-row">
+      <div class="modal-season-cup">Cup ${r.cupNum} &rsquo;${String(r.year).slice(2)}</div>
+      <div class="modal-season-name">${player.Name}</div>
+      ${r.pos === 1 ? '<span class="modal-season-badge">Champion</span>' : ''}
+      <div class="modal-season-pos ${posClass}">${ord(r.pos)}</div>
+    </div>`;
+  }).join('');
+
+  const champCallout = wins > 0
+    ? `<div class="modal-champ-callout">🏆 ${wins} Championship${wins > 1 ? 's' : ''}</div>`
+    : '';
+
+  const bioText = player.Bio || '';
+  const bioSection = bioText
+    ? `<div class="modal-bio-label">The Read</div><div class="modal-bio">${bioText}</div>`
+    : '';
+
+  const sparkSection = spark
+    ? `<div class="modal-section-label">Placement History</div>
+       <div class="modal-sparkline-wrap">${spark}</div>
+       <div class="modal-sparkline-labels"><span>${seasonResults[0] ? 'Cup ' + seasonResults[0].cupNum : ''}</span><span>${seasonResults[seasonResults.length-1] ? 'Cup ' + seasonResults[seasonResults.length-1].cupNum : ''}</span></div>`
+    : '';
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-top">
+      ${photoEl}
+      <div class="modal-info">
+        <div class="modal-name">${player.Moniker || player.Name}</div>
+        <div class="modal-real-name">${player.Name}</div>
+        <div class="modal-meta-row">Cup Rank #${player.Rank || '—'} &middot; First played ${ftLabel}</div>
+        <div class="modal-stats-row">
+          <div class="modal-stat">
+            <div class="modal-stat-val">${fmtAvg(player.Average)}</div>
+            <div class="modal-stat-lbl">Avg</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-val">${player.Played || 0}</div>
+            <div class="modal-stat-lbl">Played</div>
+          </div>
+          ${bestPlace ? `<div class="modal-stat">
+            <div class="modal-stat-val">${ord(bestPlace)}</div>
+            <div class="modal-stat-lbl">Best</div>
+          </div>` : ''}
+          ${wins > 0 ? `<div class="modal-stat">
+            <div class="modal-stat-val">${wins}</div>
+            <div class="modal-stat-lbl">Title${wins > 1 ? 's' : ''}</div>
+          </div>` : ''}
+        </div>
+        ${p1 || p2 || p3 ? `<div class="modal-placings-row">
+          ${p1 ? `1st ${p1} &middot; ` : ''}${p2 ? `2nd ${p2} &middot; ` : ''}${p3 ? `3rd ${p3}` : ''}
+        </div>` : ''}
+      </div>
+    </div>
+    ${champCallout}
+    ${bioSection}
+    ${sparkSection}
+    ${seasonResults.length ? `<div class="modal-section-label">${seasonResults.length} Cup${seasonResults.length !== 1 ? 's' : ''} Played</div>${seasonRows}` : ''}
+  `;
+
+  document.getElementById('playerModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerModal() {
+  document.getElementById('playerModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('playerModal')) closePlayerModal();
 }
 
 // ── MAIN DATA LOAD ────────────────────────────────────────────────────────────
@@ -721,112 +1160,194 @@ async function loadDashboard() {
     fetch(csvUrl('LEADERBOARD')).then(r => r.text()).then(parseCSV)
   ]);
 
+  G_leaderData = leaderData;
+
   const recent = siteData.filter(r => r.Type === 'RECENT').sort((a,b) => +a.Position - +b.Position);
   const champions = siteData.filter(r => r.Type === 'CHAMPION').sort((a,b) => +a.Year - +b.Year);
 
-  // Hero stat
   document.getElementById('stat-players').textContent = leaderData.length;
 
-  // Podium
+  // Podium with photos
   const lastYear = recent.length ? recent[0].Year : '2026';
+  const lastCupFolder = CUP_FOLDER[+lastYear] || 'SPT9';
   document.getElementById('last-year-label').textContent = 'CUP ' + lastYear;
   const posCls = ['pos-1','pos-2','pos-3'];
   const posLabel = ['Champion', '2nd Place', '3rd Place'];
-  document.getElementById('podium').innerHTML = recent.slice(0,3).map((r, i) => `
-    <div class="podium-card ${posCls[i]}">
-      <div class="podium-pos">${posLabel[i]}</div>
-      <div class="podium-name">${r.Name}</div>
-      <div class="podium-moniker">${r.Moniker}</div>
-    </div>
-  `).join('');
+  document.getElementById('podium').innerHTML = recent.slice(0,3).map((r, i) => {
+    const pos = i + 1;
+    const photoSrc = imgPath(lastCupFolder, `${pos}.jpg`);
+    return `
+      <div class="podium-card ${posCls[i]}" onclick="openPhoto('${photoSrc}', '${posLabel[i]} — ${r.Name} — Cup ${lastYear}')">
+        <img class="podium-photo" src="${photoSrc}" alt="${r.Name}"
+          onerror="this.outerHTML='<div class=\'podium-photo-placeholder\'>No photo yet</div>'">
+        <div class="podium-body">
+          <div class="podium-pos">${posLabel[i]}</div>
+          <div class="podium-name">${r.Name}</div>
+          <div class="podium-moniker">${r.Moniker}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 
-  // Best stats
+  // Best stats - expanded
   const byAvg = [...leaderData].sort((a,b) => parseFloat(a.Average) - parseFloat(b.Average));
   const byPlayed = [...leaderData].sort((a,b) => +b.Played - +a.Played);
-  const bestStats = [
-    { label: 'Best Average', player: byAvg[0], value: fmtAvg(byAvg[0].Average), unit: 'avg' },
-    { label: 'Most Tournaments', player: byPlayed[0], value: byPlayed[0].Played, unit: 'played' },
-  ];
-  document.getElementById('best-stats').innerHTML = bestStats.map(s => `
+  const byWins = [...leaderData].filter(p => p.Winner === 'YES' || parseInt(p.Wins) > 0)
+    .sort((a,b) => (parseInt(b.Wins) || 1) - (parseInt(a.Wins) || 1));
+
+  // Most consistent: we need cup data for this - compute after cup load
+  document.getElementById('best-stats').innerHTML = [
+    { label: 'Best Average', player: byAvg[0], value: fmtAvg(byAvg[0]?.Average), unit: 'avg' },
+    { label: 'Most Tournaments', player: byPlayed[0], value: byPlayed[0]?.Played, unit: 'played' },
+    ...(byWins.length ? [{ label: 'Most Titles', player: byWins[0], value: (parseInt(byWins[0]?.Wins) || 1), unit: 'wins' }] : []),
+  ].map(s => s.player ? `
     <div class="best-stat-card">
       <div class="best-stat-label">${s.label}</div>
       <div class="best-stat-name">${s.player.Name}</div>
       <div class="best-stat-moniker">${s.player.Moniker}</div>
       <div class="best-stat-value">${s.value}<span class="best-stat-unit">${s.unit}</span></div>
     </div>
-  `).join('');
+  ` : '').join('');
 
   // Champions roll
-  const cupNums = { 2018:1,2019:2,2020:3,2021:4,2022:5,2023:6,2024:7,2025:8,2026:9 };
   document.getElementById('champions').innerHTML = champions.map(c => `
     <div class="champion-card">
       <div class="champion-year">${c.Year}</div>
       <div class="champion-info">
         <div class="champion-name">${c.Name}</div>
-        <div class="champion-moniker">${c.Moniker} &mdash; Cup ${cupNums[+c.Year] || ''}</div>
+        <div class="champion-moniker">${c.Moniker} — Cup ${CUP_NUMS[+c.Year] || ''}</div>
       </div>
       <div class="champion-trophy">🏆</div>
     </div>
   `).join('');
 
-  // Year-by-year: fetch all CUP sheets
-  loadYearByYear();
+  loadYearByYear(leaderData);
 }
 
-async function loadYearByYear() {
-  const cupNums = { 2018:1,2019:2,2020:3,2021:4,2022:5,2023:6,2024:7,2025:8,2026:9 };
+async function loadYearByYear(leaderData) {
   const fetches = YEARS.map(y => fetch(csvUrl('CUP' + y)).then(r => r.text()).then(parseCSV));
   const results = await Promise.all(fetches);
 
-  // Build tabs most-recent-first
-  const yearsDesc = [...YEARS].reverse();
+  // Cache cup data globally for modal use
+  YEARS.forEach((y, i) => { G_cupData[y] = results[i]; });
 
+  // Compute additional best stats now that we have cup data
+  updateBestStats(leaderData, results);
+
+  // Build tabs earliest left → latest right
   const tabBar = document.getElementById('cup-tab-bar');
   const panelsWrap = document.getElementById('cup-tab-panels');
 
-  tabBar.innerHTML = yearsDesc.map((y, i) => `
-    <button class="cup-tab-btn${i === 0 ? ' active' : ''}" onclick="switchCupTab(${y})" id="tab-btn-${y}">
-      Cup ${cupNums[y]} &rsquo;${String(y).slice(2)}
+  tabBar.innerHTML = YEARS.map((y, i) => `
+    <button class="cup-tab-btn${i === YEARS.length - 1 ? ' active' : ''}" onclick="switchCupTab(${y})" id="tab-btn-${y}">
+      Cup ${CUP_NUMS[y]} &rsquo;${String(y).slice(2)}
     </button>
   `).join('');
 
-  panelsWrap.innerHTML = yearsDesc.map((y, i) => {
+  panelsWrap.innerHTML = YEARS.map((y, i) => {
     const idx = YEARS.indexOf(y);
     const data = results[idx].filter(r => r.Position && r.Name);
     const sorted = data.sort((a, b) => +a.Position - +b.Position);
+    const folder = CUP_FOLDER[y];
+    const eventPhotoPath = imgPath(folder, 'event/1.jpg');
 
     const rows = sorted.map(p => {
       const pos = +p.Position;
-      let posClass = '';
-      if (pos === 1) posClass = 'cup-pos-1';
-      else if (pos === 2) posClass = 'cup-pos-2';
-      else if (pos === 3) posClass = 'cup-pos-3';
+      let rowClass = '';
+      if (pos === 1) rowClass = 'cup-row-gold';
+      else if (pos === 2) rowClass = 'cup-row-silver';
+      else if (pos === 3) rowClass = 'cup-row-bronze';
+      const photoSrc = imgPath(folder, `${pos}.jpg`);
       return `
         <tr>
-          <td class="cup-pos-cell ${posClass}">${ord(pos)}</td>
-          <td class="cup-name-cell">${p.Name}</td>
-          <td class="cup-moniker-cell">${p.Moniker || ''}</td>
+          <td style="padding:0">
+            <div class="cup-row-inner ${rowClass}">
+              <span class="cup-pos-cell">${ord(pos)}</span>
+              <span class="cup-name-cell" onclick="openPlayerModal('${p.Name.replace(/'/g,"\\'")}')">
+                ${p.Name}
+              </span>
+              <span class="cup-moniker-cell">${p.Moniker || ''}</span>
+              <a class="place-btn" href="#" onclick="event.preventDefault();openPhoto('${photoSrc}','${ord(pos)} — ${p.Name} — Cup ${CUP_NUMS[y]} (${y})')">Photo</a>
+            </div>
+          </td>
         </tr>
       `;
     }).join('');
 
+    const isActive = i === YEARS.length - 1;
     return `
-      <div class="cup-tab-panel${i === 0 ? ' active' : ''}" id="tab-panel-${y}">
-        <div class="table-wrap">
+      <div class="cup-tab-panel${isActive ? ' active' : ''}" id="tab-panel-${y}">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+          <a class="tournament-photos-btn" href="#" onclick="event.preventDefault();openPhoto('${eventPhotoPath}','Cup ${CUP_NUMS[y]} (${y}) — Tournament Photos')">
+            📷 Tournament Photos
+          </a>
+        </div>
+        <div class="table-wrap" style="margin-bottom:0;">
           <table class="cup-results-table">
             <thead>
               <tr>
-                <th>Place</th>
-                <th>Player</th>
-                <th>Moniker</th>
+                <th style="padding-left:12px">Place &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Player &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Moniker</th>
+                <th style="text-align:right;padding-right:12px"></th>
               </tr>
             </thead>
-            <tbody>${rows || '<tr><td colspan="3" style="color:var(--text-muted);text-align:center;padding:24px">No data</td></tr>'}</tbody>
+            <tbody>${rows || '<tr><td><div class="loading">No data</div></td></tr>'}</tbody>
           </table>
         </div>
       </div>
     `;
   }).join('');
+}
+
+function updateBestStats(leaderData, results) {
+  // Streak: most consecutive years attended
+  let bestStreak = { name: '', moniker: '', val: 0 };
+  leaderData.forEach(p => {
+    let streak = 0, best = 0;
+    YEARS.forEach((y, i) => {
+      const found = (results[i] || []).find(r => r.Name === p.Name);
+      if (found) { streak++; best = Math.max(best, streak); } else { streak = 0; }
+    });
+    if (best > bestStreak.val) bestStreak = { name: p.Name, moniker: p.Moniker, val: best };
+  });
+
+  // Best single placing (lowest position number among all 1st places is always 1, so: most wins OR best place per player)
+  // Most 1st places
+  const winsMap = {};
+  YEARS.forEach((y, i) => {
+    (results[i] || []).filter(r => +r.Position === 1).forEach(r => {
+      winsMap[r.Name] = (winsMap[r.Name] || { name: r.Name, moniker: r.Moniker, val: 0 });
+      winsMap[r.Name].val++;
+    });
+  });
+  const topWinner = Object.values(winsMap).sort((a,b) => b.val - a.val)[0];
+
+  // Veteran debutant (played most cups, debut Cup 1)
+  const veteran = leaderData.filter(p => p.FirstTournament === '1').sort((a,b) => +b.Played - +a.Played)[0];
+
+  const grid = document.getElementById('best-stats');
+  const extras = [
+    topWinner ? { label: 'Most Titles', player: { Name: topWinner.name, Moniker: topWinner.moniker }, value: topWinner.val, unit: 'wins' } : null,
+    bestStreak.val > 1 ? { label: 'Longest Run', player: { Name: bestStreak.name, Moniker: bestStreak.moniker }, value: bestStreak.val, unit: 'in a row' } : null,
+    veteran ? { label: 'Original & Still Here', player: veteran, value: veteran.Played, unit: 'cups' } : null,
+  ].filter(Boolean);
+
+  const byAvg = [...leaderData].sort((a,b) => parseFloat(a.Average) - parseFloat(b.Average));
+  const byPlayed = [...leaderData].sort((a,b) => +b.Played - +a.Played);
+
+  const allStats = [
+    { label: 'Best Average', player: byAvg[0], value: fmtAvg(byAvg[0]?.Average), unit: 'avg' },
+    { label: 'Most Tournaments', player: byPlayed[0], value: byPlayed[0]?.Played, unit: 'played' },
+    ...extras,
+  ];
+
+  grid.innerHTML = allStats.map(s => s?.player ? `
+    <div class="best-stat-card">
+      <div class="best-stat-label">${s.label}</div>
+      <div class="best-stat-name">${s.player.Name}</div>
+      <div class="best-stat-moniker">${s.player.Moniker}</div>
+      <div class="best-stat-value">${s.value}<span class="best-stat-unit">${s.unit}</span></div>
+    </div>
+  ` : '').join('');
 }
 
 function switchCupTab(year) {
@@ -838,30 +1359,93 @@ function switchCupTab(year) {
 
 async function loadPlayers() {
   const data = await fetch(csvUrl('LEADERBOARD')).then(r => r.text()).then(parseCSV);
+  if (!G_leaderData.length) G_leaderData = data;
   document.getElementById('player-count').textContent = data.length + ' players';
 
   const firstTournamentLabel = ['Cup 1 (2018)','Cup 2 (2019)','Cup 3 (2020)','Cup 4 (2021)','Cup 5 (2022)','Cup 6 (2023)','Cup 7 (2024)','Cup 8 (2025)','Cup 9 (2026)'];
 
   document.getElementById('players-grid').innerHTML = data.map((p, i) => {
     const isWinner = p.Winner === 'YES';
+    const wins = parseInt(p.Wins) || (isWinner ? 1 : 0);
     const ftIdx = parseInt(p.FirstTournament) - 1;
     const ftLabel = firstTournamentLabel[ftIdx] || ('Cup ' + p.FirstTournament);
+    const rank = p.Rank || (i + 1);
+
+    // Player photo - we'll try to load from their first cup
+    const firstFolder = p.FirstTournament ? `SPT${p.FirstTournament}` : null;
+    const photoSrc = firstFolder ? imgPath(firstFolder, 'portrait.jpg') : null;
+
+    // Sparkline placeholder - will be filled once cup data loads
+    const sparkId = `spark-${p.Name.replace(/\s/g,'_')}`;
+
     return `
-      <div class="player-card${isWinner ? ' is-winner' : ''}">
-        <div class="player-rank">${p.Rank || i+1}</div>
-        <div class="player-info">
-          <div class="player-name">${p.Name}</div>
-          <div class="player-moniker">${p.Moniker}</div>
-          ${isWinner ? '<div class="winner-badge">🏆 Winner</div>' : ''}
+      <div class="player-card${isWinner ? ' is-winner' : ''}" onclick="openPlayerModal('${p.Name.replace(/'/g,"\\'")}')">
+        <div class="player-photo-wrap">
+          ${photoSrc
+            ? `<img class="player-photo" src="${photoSrc}" alt="${p.Moniker}" onerror="this.outerHTML='<div class=\'player-photo-placeholder\'>🃏</div>'">`
+            : `<div class="player-photo-placeholder">🃏</div>`}
         </div>
-        <div class="player-stats">
-          <span class="player-avg">${fmtAvg(p.Average)}</span>
-          <div class="player-meta">${p.Played} played</div>
-          <div class="player-meta" style="margin-top:2px"><span class="badge-first">since ${ftLabel}</span></div>
+        <div class="player-card-body">
+          <div class="player-moniker-large">${p.Moniker || p.Name}</div>
+          <div class="player-rank-label">All-Time #${rank}</div>
+          <div class="player-card-stats">
+            <div class="player-card-stat">
+              <span class="player-card-stat-value">${fmtAvg(p.Average)}</span>
+              <span class="player-card-stat-label">Avg</span>
+            </div>
+            <div class="player-card-stat">
+              <span class="player-card-stat-value">${p.Played || 0}</span>
+              <span class="player-card-stat-label">Played</span>
+            </div>
+          </div>
+          <svg class="player-sparkline" id="${sparkId}" viewBox="0 0 160 32"></svg>
+          <div class="player-sparkline-label">
+            <span>${ftLabel}</span>
+            <span>Cup 9</span>
+          </div>
+          ${wins > 0
+            ? `<button class="champ-btn">${wins} Championship${wins > 1 ? 's' : ''}</button>`
+            : `<div class="champ-btn-placeholder">View Profile</div>`}
         </div>
       </div>
     `;
   }).join('');
+
+  // Fill sparklines once G_cupData is ready
+  fillSparklines(data);
+}
+
+function fillSparklines(players) {
+  const tryFill = () => {
+    if (!Object.keys(G_cupData).length) { setTimeout(tryFill, 300); return; }
+    players.forEach(p => {
+      const placements = YEARS.map(y => {
+        const rows = G_cupData[y] || [];
+        const found = rows.find(r => r.Name === p.Name);
+        return found ? +found.Position : null;
+      }).filter(v => v !== null);
+
+      const el = document.getElementById(`spark-${p.Name.replace(/\s/g,'_')}`);
+      if (!el || placements.length < 2) return;
+
+      const min = Math.min(...placements);
+      const max = Math.max(...placements);
+      const range = max - min || 1;
+      const w = 160, h = 32, pad = 3;
+      const pts = placements.map((v, i) => {
+        const x = pad + (i / (placements.length - 1)) * (w - pad*2);
+        const y = pad + ((v - min) / range) * (h - pad*2);
+        return [x, y];
+      });
+      const path = pts.map((pt, i) => (i === 0 ? `M${pt[0]},${pt[1]}` : `L${pt[0]},${pt[1]}`)).join(' ');
+      const last = pts[pts.length - 1];
+      el.innerHTML = `
+        <path d="${path}" fill="none" stroke="#4a9eff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${last[0]}" cy="${last[1]}" r="2.5" fill="#4a9eff"/>
+      `;
+    });
+  };
+  tryFill();
 }
 
 // Init
