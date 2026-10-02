@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPT Cup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg-card: #161616;
+    --bg-card-2: #1c1c1c;
+    --text: #f0ede8;
+    --text-muted: #6b6860;
+    --text-dim: #3a3834;
+    --accent: #c8a96e;
+    --accent-warm: #e8b84b;
+    --accent-dim: #3a2e14;
+    --border: #2a2724;
+    --border-strong: #3a3734;
+    --radius: 8px;
+    --font-mono: "IBM Plex Mono", "Courier New", monospace;
+    --font-sans: "Space Grotesk", system-ui, sans-serif;
+    --gold: #f4c842;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+  }
+  [data-theme="light"] {
+    --bg: #f5f2ed;
+    --bg-card: #ffffff;
+    --bg-card-2: #f0ede8;
+    --text: #1a1814;
+    --text-muted: #8a8680;
+    --text-dim: #c0bdb8;
+    --accent: #9a6e2e;
+    --accent-warm: #c8941a;
+    --accent-dim: #f5e8cc;
+    --border: #e0ddd8;
+    --border-strong: #c8c5c0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 24px;
+    height: 52px;
+  }
+  [data-theme="light"] nav { background: rgba(245,242,237,0.92); }
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-right: 32px;
+  }
+  .nav-links { display: flex; gap: 2px; flex: 1; }
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  .nav-link:hover { color: var(--text); background: var(--bg-card); }
+  .nav-link.active { color: var(--accent); }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .theme-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 4px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .theme-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+  /* SECTIONS */
+  section { display: none; }
+  section.active { display: block; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 72px 24px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-wordmark {
+    font-family: var(--font-mono);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .hero-cup {
+    color: var(--accent);
+  }
+  .hero-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+  }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat-value {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+  .hero-stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* LAST TOURNAMENT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-top: 48px;
+  }
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .section-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* PODIUM */
+  .podium {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .podium-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .podium-card.pos-1 {
+    border-color: var(--gold);
+    background: linear-gradient(180deg, rgba(244,200,66,0.05) 0%, var(--bg-card) 100%);
+  }
+  .podium-card.pos-2 {
+    border-color: var(--silver);
+    background: linear-gradient(180deg, rgba(192,192,192,0.04) 0%, var(--bg-card) 100%);
+  }
+  .podium-card.pos-3 {
+    border-color: var(--bronze);
+    background: linear-gradient(180deg, rgba(205,127,50,0.04) 0%, var(--bg-card) 100%);
+  }
+  .podium-pos {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .pos-1 .podium-pos { color: var(--gold); }
+  .pos-2 .podium-pos { color: var(--silver); }
+  .pos-3 .podium-pos { color: var(--bronze); }
+  .podium-name {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .podium-moniker {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* BEST PLAYER STATS */
+  .best-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .best-stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .best-stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .best-stat-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .best-stat-moniker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .best-stat-value {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .best-stat-unit {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  /* YEAR-BY-YEAR TABLE */
+  .table-wrap { overflow-x: auto; margin-bottom: 48px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg-card-2); }
+  .td-pos { font-weight: 700; color: var(--accent); min-width: 36px; }
+  .td-gold { color: var(--gold); font-weight: 700; }
+  .td-silver { color: var(--silver); }
+  .td-bronze { color: var(--bronze); }
+  .td-dnp { color: var(--text-dim); }
+  .td-name { font-family: var(--font-sans); font-size: 13px; font-weight: 600; min-width: 140px; }
+  .td-mono { font-family: var(--font-mono); color: var(--text-muted); }
+
+  /* CHAMPIONS ROLL */
+  .champions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+  .champion-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .champion-year {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 42px;
+  }
+  .champion-info {}
+  .champion-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .champion-moniker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .champion-trophy {
+    margin-left: auto;
+    font-size: 18px;
+    opacity: 0.7;
+  }
+
+  /* PLAYERS PAGE */
+  .players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+    padding-top: 32px;
+    padding-bottom: 48px;
+  }
+  .player-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.15s;
+  }
+  .player-card:hover { border-color: var(--border-strong); }
+  .player-card.is-winner { border-color: rgba(244,200,66,0.3); }
+  .player-rank {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 22px;
+    text-align: right;
+  }
+  .player-info { flex: 1; min-width: 0; }
+  .player-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .player-moniker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .player-stats { text-align: right; }
+  .player-avg {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+  .player-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .winner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(244,200,66,0.1);
+    border: 1px solid rgba(244,200,66,0.3);
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 100px;
+    margin-top: 6px;
+  }
+
+  /* UTIL */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+  .loading {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 32px 0;
+    text-align: center;
+    letter-spacing: 0.1em;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  .badge-first {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+
+  /* YEAR RESULTS TABLE */
+  .year-results-table th, .year-results-table td {
+    padding: 8px 10px;
+  }
+  .year-cell {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .hero-wordmark { font-size: 48px; }
+    .podium { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+    nav { padding: 0 16px; }
+    .container { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">SPT<span style="color:var(--text-muted)"> / </span>CUP</a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showSection('dashboard', this)">Dashboard</button>
+    <button class="nav-link" onclick="showSection('players', this)">Players</button>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+  </div>
+</nav>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="active">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-wordmark">SPT <span class="hero-cup">CUP</span></div>
+    <div class="hero-sub">Home game. Hard fought. Nine years running.</div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-value">9</span>
+        <div class="hero-stat-label">Tournaments</div>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value" id="stat-players">—</span>
+        <div class="hero-stat-label">Players All-Time</div>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">2018</span>
+        <div class="hero-stat-label">Established</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- LAST TOURNAMENT -->
+    <div class="section-header">
+      <span class="section-title">Last Tournament</span>
+      <span class="section-meta" id="last-year-label">CUP 2026</span>
+    </div>
+    <div class="podium" id="podium">
+      <div class="loading">Dealing cards...</div>
+    </div>
+
+    <!-- BEST STATS -->
+    <div class="section-header">
+      <span class="section-title">Best of the Cup</span>
+    </div>
+    <div class="best-stat-grid" id="best-stats">
+      <div class="loading">Shuffling...</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ALL-TIME CHAMPIONS -->
+    <div class="section-header">
+      <span class="section-title">All-Time Champions</span>
+    </div>
+    <div class="champions-grid" id="champions">
+      <div class="loading">Counting chips...</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- YEAR BY YEAR -->
+    <div class="section-header">
+      <span class="section-title">Year-by-Year Results</span>
+      <span class="section-meta">Top 3 per year</span>
+    </div>
+    <div class="table-wrap">
+      <table class="year-results-table" id="year-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>1st</th>
+            <th>2nd</th>
+            <th>3rd</th>
+          </tr>
+        </thead>
+        <tbody id="year-table-body">
+          <tr><td colspan="4"><div class="loading">Running the numbers...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- PLAYERS -->
+<section id="players">
+  <div class="container">
+    <div class="section-header" style="padding-bottom: 4px;">
+      <span class="section-title">All Players</span>
+      <span class="section-meta" id="player-count">—</span>
+    </div>
+    <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:0;">Ranked by average placement (lower is better). Tiebreaker: most tournaments played.</p>
+    <div class="players-grid" id="players-grid">
+      <div class="loading" style="grid-column:1/-1">Loading players...</div>
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid var(--border);padding:24px;text-align:center;">
+  <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;">SPT Cup — Data from <a href="https://docs.google.com/spreadsheets/d/1MlXF2rRCRJQK88KVHdDVrQgq9PB_KTIi3W0f4TYFnuM" target="_blank" style="color:var(--text-muted);text-decoration:none;">the databook</a> — Est. 2018</span>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const SHEET_ID = '1MlXF2rRCRJQK88KVHdDVrQgq9PB_KTIi3W0f4TYFnuM';
+const YEARS = [2018,2019,2020,2021,2022,2023,2024,2025,2026];
+
+function csvUrl(sheet) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheet}`;
+}
+
+// ── CSV PARSER ───────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = parseRow(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = parseRow(line);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    return obj;
+  });
+}
+function parseRow(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── THEME ────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☾' : '☀';
+  try { localStorage.setItem('sptcup-theme', isDark ? 'light' : 'dark'); } catch(e){}
+}
+(function() {
+  try {
+    const saved = localStorage.getItem('sptcup-theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').textContent = saved === 'light' ? '☾' : '☀';
+    }
+  } catch(e) {}
+})();
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── ORDINAL ──────────────────────────────────────────────────────────────────
+function ord(n) {
+  const s = ['th','st','nd','rd'], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+// ── FORMAT AVG ───────────────────────────────────────────────────────────────
+function fmtAvg(v) {
+  const n = parseFloat(v);
+  if (isNaN(n)) return '—';
+  return n % 1 === 0 ? n.toString() : n.toFixed(2);
+}
+
+// ── MAIN DATA LOAD ────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const [siteData, leaderData] = await Promise.all([
+    fetch(csvUrl('SITE')).then(r => r.text()).then(parseCSV),
+    fetch(csvUrl('LEADERBOARD')).then(r => r.text()).then(parseCSV)
+  ]);
+
+  const recent = siteData.filter(r => r.Type === 'RECENT').sort((a,b) => +a.Position - +b.Position);
+  const champions = siteData.filter(r => r.Type === 'CHAMPION').sort((a,b) => +a.Year - +b.Year);
+
+  // Hero stat
+  document.getElementById('stat-players').textContent = leaderData.length;
+
+  // Podium
+  const lastYear = recent.length ? recent[0].Year : '2026';
+  document.getElementById('last-year-label').textContent = 'CUP ' + lastYear;
+  const posCls = ['pos-1','pos-2','pos-3'];
+  const posLabel = ['Champion', '2nd Place', '3rd Place'];
+  document.getElementById('podium').innerHTML = recent.slice(0,3).map((r, i) => `
+    <div class="podium-card ${posCls[i]}">
+      <div class="podium-pos">${posLabel[i]}</div>
+      <div class="podium-name">${r.Name}</div>
+      <div class="podium-moniker">${r.Moniker}</div>
+    </div>
+  `).join('');
+
+  // Best stats
+  const byAvg = [...leaderData].sort((a,b) => parseFloat(a.Average) - parseFloat(b.Average));
+  const byPlayed = [...leaderData].sort((a,b) => +b.Played - +a.Played);
+  const bestStats = [
+    { label: 'Best Average', player: byAvg[0], value: fmtAvg(byAvg[0].Average), unit: 'avg' },
+    { label: 'Most Tournaments', player: byPlayed[0], value: byPlayed[0].Played, unit: 'played' },
+  ];
+  document.getElementById('best-stats').innerHTML = bestStats.map(s => `
+    <div class="best-stat-card">
+      <div class="best-stat-label">${s.label}</div>
+      <div class="best-stat-name">${s.player.Name}</div>
+      <div class="best-stat-moniker">${s.player.Moniker}</div>
+      <div class="best-stat-value">${s.value}<span class="best-stat-unit">${s.unit}</span></div>
+    </div>
+  `).join('');
+
+  // Champions roll
+  const cupNums = { 2018:1,2019:2,2020:3,2021:4,2022:5,2023:6,2024:7,2025:8,2026:9 };
+  document.getElementById('champions').innerHTML = champions.map(c => `
+    <div class="champion-card">
+      <div class="champion-year">${c.Year}</div>
+      <div class="champion-info">
+        <div class="champion-name">${c.Name}</div>
+        <div class="champion-moniker">${c.Moniker} &mdash; Cup ${cupNums[+c.Year] || ''}</div>
+      </div>
+      <div class="champion-trophy">🏆</div>
+    </div>
+  `).join('');
+
+  // Year-by-year: fetch all CUP sheets
+  loadYearByYear();
+}
+
+async function loadYearByYear() {
+  const fetches = YEARS.map(y => fetch(csvUrl('CUP' + y)).then(r => r.text()).then(parseCSV));
+  const results = await Promise.all(fetches);
+
+  const rows = YEARS.map((y, i) => {
+    const data = results[i].filter(r => r.Position && +r.Position >= 1 && +r.Position <= 3);
+    const top3 = [1,2,3].map(p => data.find(r => +r.Position === p));
+    return { year: y, top3 };
+  }).reverse(); // most recent first
+
+  const posCols = ['td-gold','td-silver','td-bronze'];
+  document.getElementById('year-table-body').innerHTML = rows.map(r => `
+    <tr>
+      <td class="year-cell">${r.year}</td>
+      ${r.top3.map((p, i) => `<td class="${posCols[i]}">${p ? p.Name + ' <span style="color:var(--text-muted);font-weight:400">(' + p.Moniker + ')</span>' : '—'}</td>`).join('')}
+    </tr>
+  `).join('');
+}
+
+async function loadPlayers() {
+  const data = await fetch(csvUrl('LEADERBOARD')).then(r => r.text()).then(parseCSV);
+  document.getElementById('player-count').textContent = data.length + ' players';
+
+  const firstTournamentLabel = ['Cup 1 (2018)','Cup 2 (2019)','Cup 3 (2020)','Cup 4 (2021)','Cup 5 (2022)','Cup 6 (2023)','Cup 7 (2024)','Cup 8 (2025)','Cup 9 (2026)'];
+
+  document.getElementById('players-grid').innerHTML = data.map((p, i) => {
+    const isWinner = p.Winner === 'YES';
+    const ftIdx = parseInt(p.FirstTournament) - 1;
+    const ftLabel = firstTournamentLabel[ftIdx] || ('Cup ' + p.FirstTournament);
+    return `
+      <div class="player-card${isWinner ? ' is-winner' : ''}">
+        <div class="player-rank">${p.Rank || i+1}</div>
+        <div class="player-info">
+          <div class="player-name">${p.Name}</div>
+          <div class="player-moniker">${p.Moniker}</div>
+          ${isWinner ? '<div class="winner-badge">🏆 Winner</div>' : ''}
+        </div>
+        <div class="player-stats">
+          <span class="player-avg">${fmtAvg(p.Average)}</span>
+          <div class="player-meta">${p.Played} played</div>
+          <div class="player-meta" style="margin-top:2px"><span class="badge-first">since ${ftLabel}</span></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Init
+loadDashboard();
+loadPlayers();
+</script>
+</body>
+</html>
