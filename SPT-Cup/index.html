@@ -117,16 +117,27 @@
     padding: 72px 24px 48px;
     border-bottom: 1px solid var(--border);
   }
-  .hero-wordmark {
-    font-family: var(--font-mono);
-    font-size: clamp(48px, 8vw, 96px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    color: var(--text);
-    margin-bottom: 8px;
+  /* SVG logo: SPT part = gold default → colour on hover; CUP part = adaptive b/w */
+  .hero-logo-wrap {
+    display: inline-block;
+    margin-bottom: 16px;
+    cursor: default;
   }
-  .hero-cup { color: var(--accent); }
+  .hero-logo-wrap svg {
+    width: clamp(220px, 40vw, 520px);
+    height: auto;
+    display: block;
+    transition: filter 0.2s;
+  }
+  /* SPT paths (blue .st1 in source) → gold by default */
+  .hero-logo-wrap .st1 { fill: var(--gold); transition: fill 0.2s; }
+  /* CUP paths (.st2 in source) → black in light, white in dark */
+  .hero-logo-wrap .st2 { fill: var(--text); transition: fill 0.2s; }
+  /* The little red element (.st0) → gold to match SPT part */
+  .hero-logo-wrap .st0 { fill: var(--gold); transition: fill 0.2s; }
+  /* On hover: SPT turns its original blue, red stays red, CUP unchanged */
+  .hero-logo-wrap:hover .st1 { fill: #315cc3; }
+  .hero-logo-wrap:hover .st0 { fill: #c10222; }
   .hero-sub {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -134,6 +145,7 @@
     text-transform: uppercase;
     color: var(--text-muted);
     margin-bottom: 48px;
+    line-height: 2;
   }
   .hero-stats { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
   .hero-stat { text-align: center; }
@@ -489,12 +501,10 @@
     color: var(--text-muted);
   }
   .player-sparkline {
-    width: 100%;
-    height: 32px;
-    margin-bottom: 6px;
+    display: none; /* sparkline shown only in profile modal */
   }
   .player-sparkline-label {
-    display: flex;
+    display: none; /* hidden on cards, shown in modal */
     justify-content: space-between;
     font-family: var(--font-mono);
     font-size: 9px;
@@ -503,8 +513,8 @@
   }
   .champ-btn {
     width: 100%;
-    background: #c0392b;
-    color: #fff;
+    background: var(--gold);
+    color: #111;
     border: none;
     border-radius: 4px;
     font-family: var(--font-mono);
@@ -516,7 +526,7 @@
     cursor: pointer;
     transition: background 0.15s;
   }
-  .champ-btn:hover { background: #a93226; }
+  .champ-btn:hover { background: #e8b84b; }
   .champ-btn-placeholder {
     width: 100%;
     background: var(--bg-card-2);
@@ -788,7 +798,6 @@
   }
 
   @media (max-width: 600px) {
-    .hero-wordmark { font-size: 48px; }
     .podium { grid-template-columns: 1fr; }
     .hero-stats { gap: 24px; }
     nav { padding: 0 16px; }
@@ -797,6 +806,145 @@
     .modal-top { flex-direction: column; }
     .modal-photo, .modal-photo-placeholder { width: 80px; height: 80px; }
   }
+
+  /* ADMIN PANEL */
+  .admin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1500;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+  .admin-overlay.open { display: flex; }
+  .admin-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 560px;
+    position: relative;
+    overflow: hidden;
+  }
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card-2);
+  }
+  .admin-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .admin-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .admin-close:hover { color: var(--text); }
+  .admin-body { padding: 24px; }
+  .admin-field-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    margin-top: 16px;
+    display: block;
+  }
+  .admin-field-label:first-child { margin-top: 0; }
+  .admin-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+  }
+  .admin-select:focus { border-color: var(--accent); }
+  .admin-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 10px 12px;
+    min-height: 120px;
+    resize: vertical;
+    outline: none;
+  }
+  .admin-textarea:focus { border-color: var(--accent); }
+  .admin-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .admin-note strong { color: var(--accent); }
+  .admin-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .admin-btn-copy {
+    flex: 1;
+    background: var(--accent);
+    color: #111;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .admin-btn-copy:hover { background: var(--accent-warm); }
+  .admin-btn-cancel {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .admin-btn-cancel:hover { color: var(--text); border-color: var(--border-strong); }
+  .admin-copied-msg {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-align: center;
+    margin-top: 10px;
+    display: none;
+  }
+  .admin-copied-msg.show { display: block; }
 </style>
 </head>
 <body>
@@ -808,6 +956,7 @@
     <button class="nav-link" onclick="showSection('players', this)">Players</button>
   </div>
   <div class="nav-right">
+    <button class="nav-link" onclick="openAdmin()" style="font-size:10px;letter-spacing:0.06em;">⚙ Admin</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">☀</button>
   </div>
 </nav>
@@ -816,8 +965,24 @@
 <section id="dashboard" class="active">
 
   <div class="hero">
-    <div class="hero-wordmark">SPT <span class="hero-cup">CUP</span></div>
-    <div class="hero-sub">Home game. Hard fought. Nine years running.</div>
+    <div class="hero-logo-wrap">
+      <svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 737 141.7" aria-label="SPT Cup">
+        <defs><style>.st0{fill:#c10222}.st1{fill:#315cc3}.st2{fill:#222221}</style></defs>
+        <path class="st1" d="M5.4,11.3v107.4l13.3-74.4s-11-2-12.7-2.3c1.5-1,16.7-11.7,16.7-11.7l3.5-19.3s9.1,1.5,9.2,1.6l-1.8,10.2S54.8,8,64.2,1.5H15.2c-5.4,0-9.8,4.4-9.8,9.8h0Z"/>
+        <path class="st0" d="M111.9,1.5h-42.2c8.1,11.6,40.3,57.8,41.3,59.2-1.7-.3-12.7-2.3-12.7-2.3l-14.7,81.9h28.2c5.4,0,9.8-4.4,9.8-9.8V11.3c0-5.4-4.4-9.8-9.8-9.8h0Z"/>
+        <polygon class="st1" points="67.1 74.8 55 72.6 57.2 60.6 69.2 62.7 67.1 74.8"/>
+        <rect class="st1" x="71.3" y="64.2" width="12.2" height="12.2" transform="translate(-5.3 134.4) rotate(-80)"/>
+        <polygon class="st1" points="64.6 89 52.5 86.9 54.6 74.8 66.7 77 64.6 89"/>
+        <polygon class="st1" points="79.8 91.7 67.8 89.6 69.9 77.5 81.9 79.7 79.8 91.7"/>
+        <path class="st1" d="M168.2,93.5c.5-1.7,1.7-2.2,3-1.3,7.7,4.3,16.9,7.5,23.3,8,5.4,0,8.9-2.5,8.9-6.4,0-9.9-47.1-9.4-47.1-45.9s16.9-37.3,42.4-37.3,26.9,4.9,37.5,12.1c1.3.8,1.8,2.2,1.3,3l-10.6,23.6c-.5,1.7-1.7,2.2-3,1.3-8.2-4.7-17.7-8.2-23.6-8.7-5.2,0-8.5,2.3-8.5,6,0,9.9,47.4,9.2,47.4,46s-17.2,37.2-43,37.2-28.8-4.4-37.2-11.1c-1.4-1-1.8-2.2-1.4-3l10.6-23.6h0Z"/>
+        <path class="st1" d="M287.9,13.1c29.3,0,46.9,15.9,46.9,39.8s-17.6,39.8-46.9,39.8h-6.9v33.5c0,1.2-1.2,2.3-2.7,2.3h-30c-1.2,0-2.3-1.2-2.3-2.3V15.6c0-1.3,1.2-2.5,2.3-2.5h39.5,0ZM289.4,62.8c5.9,0,9.9-4,9.9-9.9s-4-9.9-9.9-9.9h-8.7v19.8h8.7Z"/>
+        <path class="st1" d="M430.8,13.1c1.5,0,2.5,1.2,2.3,2.3l-2.5,25.4c-.2,1.3-1.5,2.3-2.7,2.3h-25v83c0,1.2-1,2.3-2.4,2.3h-29.6c-1.3,0-2.5-1.2-2.5-2.3V43.3h-27.8c-1.2,0-2.3-1-2.3-2.3V15.6c0-1.3,1.2-2.5,2.3-2.5h90.1Z"/>
+        <path class="st2" d="M436.8,70.6c0-32.7,24.7-58.7,59.3-58.7s44.9,14.4,52.5,35.4c.8,2.4-.5,3.9-2.8,3.9h-9c-1.9,0-3.2-.9-4-2.6-6.1-13.3-20.3-22.1-36.6-22.1-26.5,0-44.4,19.3-44.4,44.1s17.8,44.2,44.4,44.2,30.5-8.8,36.6-22.1c.8-1.7,2.2-2.6,4-2.6h9c2.4,0,3.7,1.5,3,3.6-7.5,21.1-28.4,35.7-52.7,35.7-34.7,0-59.3-26.1-59.3-58.7h0Z"/>
+        <path class="st2" d="M561.3,93.3V17.4c0-2.2,1.2-3.4,3.4-3.4h8.1c2.2,0,3.4,1.2,3.4,3.4v75.4c0,14.4,9.4,22,24.7,22s24.7-7.6,24.7-22V17.4c0-2.2,1.2-3.4,3.4-3.4h8.1c2.2,0,3.4,1.2,3.4,3.4v75.9c0,23.4-17.7,36.1-39.7,36.1s-39.7-12.6-39.7-36.1h0Z"/>
+        <path class="st2" d="M731.6,49.2c0,19.4-15.8,35.2-35.4,35.2h-26.1v39.5c0,2.2-1.2,3.4-3.4,3.4h-8.1c-2.2,0-3.4-1.2-3.4-3.4V17.4c0-2.2,1.2-3.4,3.4-3.4h37.7c19.7,0,35.4,15.8,35.4,35.2h0ZM716.6,49.2c0-11.8-9.1-21.1-20.5-21.1h-26.1v42.3h26.1c11.3,0,20.5-9.5,20.5-21.1h0Z"/>
+      </svg>
+    </div>
+    <div class="hero-sub">From five to infinity<br>Together by poker, connected by heart</div>
     <div class="hero-stats">
       <div class="hero-stat">
         <span class="hero-stat-value">9</span>
@@ -910,6 +1075,36 @@
       <button class="modal-close" onclick="closePlayerModal()">×</button>
     </div>
     <div class="modal-body" id="modalBody">
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminPanel" onclick="closeAdmin(event)">
+  <div class="admin-panel" onclick="event.stopPropagation()">
+    <div class="admin-header">
+      <span class="admin-title">Admin — Edit Player Bio</span>
+      <button class="admin-close" onclick="closeAdminPanel()">×</button>
+    </div>
+    <div class="admin-body">
+      <label class="admin-field-label" for="adminPlayerSelect">Select Player</label>
+      <select class="admin-select" id="adminPlayerSelect" onchange="adminLoadBio()">
+        <option value="">— choose a player —</option>
+      </select>
+
+      <label class="admin-field-label" for="adminBioText">Bio — "The Read"</label>
+      <textarea class="admin-textarea" id="adminBioText" placeholder="Write the player bio here..."></textarea>
+
+      <div class="admin-note">
+        <strong>How to save:</strong> Bios are stored in your Google Sheet's LEADERBOARD tab.<br>
+        Add a column named <strong>Bio</strong> if it doesn't exist, then paste the text below into that player's row.
+      </div>
+
+      <div class="admin-actions">
+        <button class="admin-btn-copy" onclick="adminCopyBio()">Copy Bio Text</button>
+        <button class="admin-btn-cancel" onclick="closeAdminPanel()">Close</button>
+      </div>
+      <div class="admin-copied-msg" id="adminCopiedMsg">Copied to clipboard!</div>
     </div>
   </div>
 </div>
@@ -1094,10 +1289,9 @@ function openPlayerModal(name) {
     ? `<div class="modal-champ-callout">🏆 ${wins} Championship${wins > 1 ? 's' : ''}</div>`
     : '';
 
-  const bioText = player.Bio || '';
-  const bioSection = bioText
-    ? `<div class="modal-bio-label">The Read</div><div class="modal-bio">${bioText}</div>`
-    : '';
+  const dummyBio = `A fixture at the felt since the early days, this player brings a quiet intensity to every hand. Hard to read, harder to bluff, and always the last one you want to see across the table when the chips are on the line. Nine years in the making.`;
+  const bioText = player.Bio || dummyBio;
+  const bioSection = `<div class="modal-bio-label">The Read</div><div class="modal-bio">${bioText}</div>`;
 
   const sparkSection = spark
     ? `<div class="modal-section-label">Placement History</div>
@@ -1446,6 +1640,47 @@ function fillSparklines(players) {
     });
   };
   tryFill();
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+function openAdmin() {
+  const sel = document.getElementById('adminPlayerSelect');
+  // Populate dropdown from leaderboard data
+  if (G_leaderData.length && sel.options.length <= 1) {
+    const sorted = [...G_leaderData].sort((a,b) => (a.Name||'').localeCompare(b.Name||''));
+    sorted.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.Name;
+      opt.textContent = `${p.Name}${p.Moniker ? ' — ' + p.Moniker : ''}`;
+      sel.appendChild(opt);
+    });
+  }
+  document.getElementById('adminPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAdminPanel() {
+  document.getElementById('adminPanel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeAdmin(e) {
+  if (e.target === document.getElementById('adminPanel')) closeAdminPanel();
+}
+function adminLoadBio() {
+  const name = document.getElementById('adminPlayerSelect').value;
+  const player = G_leaderData.find(p => p.Name === name);
+  document.getElementById('adminBioText').value = player?.Bio || '';
+}
+function adminCopyBio() {
+  const text = document.getElementById('adminBioText').value.trim();
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('adminCopiedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2000);
+  }).catch(() => {
+    document.getElementById('adminBioText').select();
+    document.execCommand('copy');
+  });
 }
 
 // Init
