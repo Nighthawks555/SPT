@@ -1259,10 +1259,9 @@ function openPlayerModal(name) {
   const p2 = seasonResults.filter(r => r.pos === 2).length;
   const p3 = seasonResults.filter(r => r.pos === 3).length;
 
-  // Photo - use first cup played as profile photo
-  const firstYear = seasonResults.length ? seasonResults[0].year : null;
-  const firstFolder = firstYear ? CUP_FOLDER[firstYear] : null;
-  const photoSrc = firstFolder ? imgPath(firstFolder, `${seasonResults[0].pos}.jpg`) : null;
+  // Photo - per-player folder by name slug
+  const slug = player.Name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const photoSrc = `Images/players/${slug}/portrait.jpg`;
 
   const photoEl = photoSrc
     ? `<img class="modal-photo" src="${photoSrc}" alt="${player.Moniker}" onerror="this.outerHTML='<div class=\'modal-photo-placeholder\'>🃏</div>'">`
@@ -1565,9 +1564,9 @@ async function loadPlayers() {
     const ftLabel = firstTournamentLabel[ftIdx] || ('Cup ' + p.FirstTournament);
     const rank = p.Rank || (i + 1);
 
-    // Player photo - we'll try to load from their first cup
-    const firstFolder = p.FirstTournament ? `SPT${p.FirstTournament}` : null;
-    const photoSrc = firstFolder ? imgPath(firstFolder, 'portrait.jpg') : null;
+    // Player photo - per-player folder by name slug
+    const slug = p.Name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const photoSrc = `Images/players/${slug}/portrait.jpg`;
 
     // Sparkline placeholder - will be filled once cup data loads
     const sparkId = `spark-${p.Name.replace(/\s/g,'_')}`;
